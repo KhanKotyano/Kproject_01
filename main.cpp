@@ -8,16 +8,14 @@
 #include "rlib/rlgl.h"
 
 #include "functions/functions.h"
-//#include "functions/f_common.c"
-//#include "functions/f_stack.c"
-//#include "functions/f_instance.c"
 
-#define _NEAR_BLACK (Color){15, 15, 15, 255}
+
 
 const int screenWidth = 1280;
 const int screenHeight = 720;
 Camera2D camera = { 0 };
 Camera3D camera_3d = { 0 };
+Instance inst_array[_MAX_INSTANCES] = {0};
 
 int main(){
   InitWindow(screenWidth, screenHeight, "My Game");
@@ -39,34 +37,24 @@ int main(){
   Texture2D player_sprite = LoadTexture("sprites/idk.png");
   #pragma endregion
   #pragma region Create Object
-  Instance player = CreateInstance(Vector2{0,0}, &player_sprite);
+  Instance player = CreateInstance(Vector2{0,0}, &player_sprite, inst_array);
   #pragma endregion
-  UnloadTexture(player_sprite);
-  player_sprite = LoadTexture("sprites/red_box.png");
+  //UnloadTexture(player_sprite);
+  //player_sprite = LoadTexture("sprites/red_box.png");
   
   while (!WindowShouldClose()) {
     #pragma region Step Invent
-    //UpdateStepIvent();
-    PlayerIvent(player);
+    //PlayerIvent(player);
+    UpdateInstances(inst_array);
+    //PlayerIvent(player);
     camera.target = player.pos;
     #pragma endregion
     #pragma region Draw event
     BeginDrawing();
       ClearBackground(RAYWHITE);
       BeginMode2D(camera);
-        char *player_posx = FloatToString(player.pos.y);
-        char *player_posy = FloatToString(player.pos.x);
-        
-        DrawTextureEx(*player.sprite, Vector2 {0,0}, 0, 1, GREEN);
-        DrawTextureEx(*player.sprite, player.pos, player.angle, player.scale, WHITE);
-        DrawText(player_posx, player.pos.x, player.pos.y, 8, BLACK);
-        DrawText(player_posy, player.pos.x , player.pos.y+ 24, 8, BLACK);
-        
-
-        free(player_posx);
-        free(player_posy);
+        UpdateDrawInstances(inst_array);
       EndMode2D();
-      
     EndDrawing();
 
     #pragma endregion
