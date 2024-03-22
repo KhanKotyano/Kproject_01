@@ -1,9 +1,9 @@
 #include "functions.h"
 
-Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Instance *_inst_array){
+Instance CreateInstance(Vector2 _position, Texture2D *_sprite){
   static int id = 0;
   id++;
-  Instance _instance = {
+  return (Instance){
     .ID = id,
     .active = true,
     .pos = _position,
@@ -11,16 +11,13 @@ Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Instance *_inst_a
     .scale = 1,
     .angle = 0
   };
-  Instance *inst_pointer = &_instance;
-  AddInstance(inst_pointer, _inst_array);
-  return _instance;
 };
-void AddInstance(Instance *_inst, Instance *_inst_array){
+void AddInstance( Vector2 _position, Instance *_inst_array, Texture2D *_sprite){
   for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
     if(_inst_array[i].active){
       continue;
     }
-    _inst_array[i] = *_inst;
+    _inst_array[i] = CreateInstance(_position, _sprite);
     return;
   };
 }
@@ -29,32 +26,23 @@ void UpdateInstances(Instance *_inst_array){
     if(!_inst_array[i].active){
       continue;
     }
-    PlayerIvent(_inst_array[i]);
+    //PlayerIvent(_inst_array[i]);
   };
 
 };
 void UpdateDrawInstances(Instance *_inst_array){
-  int number = 0;
+  //int number = 0;
   for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
     if(!_inst_array[i].active){
       
       continue;
     }
-    number++;
-    char *player_posx = FloatToString(_inst_array[i].pos.y);
-    char *player_posy = FloatToString(_inst_array[i].pos.x);
-    
-    DrawTextureEx(*_inst_array[i].sprite, Vector2 {0,0}, 0, 1, GREEN);
+    //number++;
     DrawTextureEx(*_inst_array[i].sprite, _inst_array[i].pos, _inst_array[i].angle, _inst_array[i].scale, WHITE);
-    DrawText(player_posx, _inst_array[i].pos.x, _inst_array[i].pos.y, 8, BLACK);
-    DrawText(player_posy, _inst_array[i].pos.x , _inst_array[i].pos.y+ 24, 8, BLACK);
     
-
-    free(player_posx);
-    free(player_posy);
   };
-  char *num = IntToString(number);
-  DrawText(num, 16, 16, 8, BLACK);
+  //char *num = IntToString(number);
+  //DrawText(num, 16, 16, 8, BLACK);
 }
 
 int PlayerIvent(Instance &self){

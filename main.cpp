@@ -34,27 +34,51 @@ int main(){
   camera_3d.projection = CAMERA_PERSPECTIVE;
   #pragma endregion
   #pragma region Load sprites
+  Texture2D enemy_sprite = LoadTexture("sprites/red_box.png");
   Texture2D player_sprite = LoadTexture("sprites/idk.png");
   #pragma endregion
   #pragma region Create Object
-  Instance player = CreateInstance(Vector2{0,0}, &player_sprite, inst_array);
+  Instance player = CreateInstance(Vector2{0,0}, &player_sprite);
+  // AddInstance(Vector2{26,26}, inst_array, &enemy_sprite);
   #pragma endregion
-  //UnloadTexture(player_sprite);
-  //player_sprite = LoadTexture("sprites/red_box.png");
-  
+  int number = 0;
   while (!WindowShouldClose()) {
     #pragma region Step Invent
-    //PlayerIvent(player);
+    number = 0;
+    if(IsKeyPressed(KEY_R)){
+      AddInstance(GetScreenToWorld2D(GetMousePosition(), camera), inst_array, &enemy_sprite);
+      TraceLog(LOG_INFO,IntToString(GetMousePosition().x));
+      TraceLog(LOG_INFO,IntToString(GetMousePosition().x));
+    }
+    PlayerIvent(player);
     UpdateInstances(inst_array);
-    //PlayerIvent(player);
     camera.target = player.pos;
+    for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
+      if(inst_array[i].active){
+        number++;
+      }
+    }; 
+
     #pragma endregion
     #pragma region Draw event
     BeginDrawing();
       ClearBackground(RAYWHITE);
       BeginMode2D(camera);
+        //number++;
+        
         UpdateDrawInstances(inst_array);
+
+        char *player_posx = FloatToString(player.pos.y);
+        char *player_posy = FloatToString(player.pos.x);
+    
+        DrawTextureEx(*player.sprite, player.pos, player.angle, player.scale, GREEN);
+        DrawText(player_posx, player.pos.x, player.pos.y, 8, BLACK);
+        DrawText(player_posy, player.pos.x , player.pos.y+ 24, 8, BLACK);
+    
+        free(player_posx);
+        free(player_posy);
       EndMode2D();
+      DrawText(IntToString(number), 0,0,24,BLACK);
     EndDrawing();
 
     #pragma endregion

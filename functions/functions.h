@@ -43,9 +43,9 @@ struct stack{
 /// @param _sprite 
 /// @param _inst_array 
 /// @return Instance
-Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Instance *_inst_array);
+Instance CreateInstance(Vector2 _position, Texture2D *_sprite);
 int PlayerIvent(Instance &self);
-void AddInstance(Instance *_inst, Instance *_inst_array);
+void AddInstance( Vector2 _position, Instance *_inst_array, Texture2D *_sprite);
 void UpdateInstances(Instance *_inst_array);
 void UpdateDrawInstances(Instance *_inst_array);
 //Common
