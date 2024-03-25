@@ -44,23 +44,21 @@ int main(){
   Texture2D enemy_sprite = LoadTexture("sprites/red_box.png");
   //Texture2D player_sprite = LoadTexture("sprites/idk.png");
   Texture2D player_animation_sprite = LoadTexture("sprites/test3.png");
+  Texture2D dude_animation_sprite = LoadTexture("sprites/test.png");
   #pragma endregion
   #pragma region Create Instance
-  Animation2D player_animation = CreateAnimation2D(&player_animation_sprite);
+  Animation2D player_animation = CreateAnimation2D(&player_animation_sprite, 6, _LOW_SPEED_ANIMATION);
+  Animation2D dude_animation = CreateAnimation2D(&dude_animation_sprite, 6, _MIDDLEPLUS_SPEED_ANIMATION);
   Instance player = CreateInstance(Vector2{0,0}, &player_animation_sprite, &player_animation);
   #pragma endregion
   int number = 0;
   printf(IntToString(_a));
   printf("\n");
-  //printf(IntToString(_b));
-  //printf("\n");
-  //printf(IntToString(_c));
-  //printf("\n");
   while (!WindowShouldClose()) {
     #pragma region Step Invent
     number = 0;
     if(IsKeyPressed(KEY_R)){
-      AddInstance(GetScreenToWorld2D(GetMousePosition(), camera), inst_array, &enemy_sprite, &player_animation);
+      AddInstance(GetScreenToWorld2D(GetMousePosition(), camera), inst_array, &enemy_sprite, &dude_animation);
     }
     PlayerIvent(player);
     UpdateInstances(inst_array);
@@ -77,8 +75,8 @@ int main(){
       ClearBackground(RAYWHITE);
       BeginMode2D(camera);
         //number++;
-        
-        UpdateDrawInstances(inst_array);
+        UpdateAnimateInstances(inst_array);
+        //UpdateDrawInstances(inst_array);
 
         char *player_posx = FloatToString(player.pos.y);
         char *player_posy = FloatToString(player.pos.x);

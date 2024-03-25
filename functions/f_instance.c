@@ -38,18 +38,22 @@ void UpdateInstances(Instance *_inst_array){
 
 };
 void UpdateDrawInstances(Instance *_inst_array){
-  //int number = 0;
   for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
     if(!_inst_array[i].active){
       
       continue;
     }
-    //number++;
     DrawTextureEx(*_inst_array[i].sprite, _inst_array[i].pos, _inst_array[i].angle, _inst_array[i].scale, WHITE);
-    
   };
-  //char *num = IntToString(number);
-  //DrawText(num, 16, 16, 8, BLACK);
+}
+void UpdateAnimateInstances(Instance *_inst_array){
+  for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
+    if(!_inst_array[i].active){
+      
+      continue;
+    }
+    DrawAndAnimate(&_inst_array[i]);
+  };
 }
 
 int PlayerIvent(Instance &self){

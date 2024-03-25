@@ -10,7 +10,14 @@
 #define _MAX_INSTANCES 32
 #define _TARGET_FPS 60
 #define _MIN_ANIMATION_SPEED 1
-#define _MAX_ANIMATION_SPEED 16
+#define _MAX_ANIMATION_SPEED 150
+#define _ANIMATION_FPS_OFFSET 4
+#define _VERYLOW_SPEED_ANIMATION (4*_ANIMATION_FPS_OFFSET)
+#define _LOW_SPEED_ANIMATION (6*_ANIMATION_FPS_OFFSET)
+#define _MIDDLE_SPEED_ANIMATION (9*_ANIMATION_FPS_OFFSET)
+#define _MIDDLEPLUS_SPEED_ANIMATION (12*_ANIMATION_FPS_OFFSET)
+#define _HIGHT_SPEED_ANIMATION (15*_ANIMATION_FPS_OFFSET)
+#define _VERYHIGHT_SPEED_ANIMATION (20*_ANIMATION_FPS_OFFSET)
 
 #pragma region Variable Declaration
 typedef signed char s8;
@@ -103,8 +110,9 @@ void push(struct stack *pt, int x);
 int peek(struct stack *pt);
 int pop(struct stack *pt);
 //Draw
+Animation2D CreateAnimation2D(Texture2D *_sprite_sheet, u8 _number_of_sprites, u8 _animation_speed);
+Animation2D InheritAnimation2D(Animation2D *_sourse, u8 _animation_speed);
 void DrawAndAnimate(Instance * _inst);
-//void GetCurrentFrame(Instance *_inst);
 void GetFrameAnimation(Animation2D *_animation);
 void DrawAnimation(Animation2D *_animation, Vector2 _pos);
 //Includes
