@@ -8,6 +8,7 @@
 #include "rlib/rlgl.h"
 
 #include "functions/functions.h"
+//Var my_int ;
 
 
 
@@ -16,6 +17,12 @@ const int screenHeight = 720;
 Camera2D camera = { 0 };
 Camera3D camera_3d = { 0 };
 Instance inst_array[_MAX_INSTANCES] = {0};
+
+int _a = sizeof(inst_array);
+//Instance *_ip;
+//int _b = sizeof(_ip);
+//Instance _ib;
+//int _c = sizeof(_ib);
 
 int main(){
   InitWindow(screenWidth, screenHeight, "My Game");
@@ -37,18 +44,22 @@ int main(){
   Texture2D enemy_sprite = LoadTexture("sprites/red_box.png");
   Texture2D player_sprite = LoadTexture("sprites/idk.png");
   #pragma endregion
-  #pragma region Create Object
+  #pragma region Create Instance
   Instance player = CreateInstance(Vector2{0,0}, &player_sprite);
   // AddInstance(Vector2{26,26}, inst_array, &enemy_sprite);
   #pragma endregion
   int number = 0;
+  printf(IntToString(_a));
+  printf("\n");
+  //printf(IntToString(_b));
+  //printf("\n");
+  //printf(IntToString(_c));
+  //printf("\n");
   while (!WindowShouldClose()) {
     #pragma region Step Invent
     number = 0;
     if(IsKeyPressed(KEY_R)){
       AddInstance(GetScreenToWorld2D(GetMousePosition(), camera), inst_array, &enemy_sprite);
-      TraceLog(LOG_INFO,IntToString(GetMousePosition().x));
-      TraceLog(LOG_INFO,IntToString(GetMousePosition().x));
     }
     PlayerIvent(player);
     UpdateInstances(inst_array);
@@ -58,7 +69,7 @@ int main(){
         number++;
       }
     }; 
-
+    
     #pragma endregion
     #pragma region Draw event
     BeginDrawing();
@@ -72,13 +83,13 @@ int main(){
         char *player_posy = FloatToString(player.pos.x);
     
         DrawTextureEx(*player.sprite, player.pos, player.angle, player.scale, GREEN);
-        DrawText(player_posx, player.pos.x, player.pos.y, 8, BLACK);
-        DrawText(player_posy, player.pos.x , player.pos.y+ 24, 8, BLACK);
-    
+        DrawText(player_posx, player.pos.x, player.pos.y - 8, 8, BLACK);
+        DrawText(player_posy, player.pos.x , player.pos.y- 16, 8, BLACK);
+
         free(player_posx);
         free(player_posy);
       EndMode2D();
-      DrawText(IntToString(number), 0,0,24,BLACK);
+      DrawText(IntToString(number), 4,4,24,BLACK);
     EndDrawing();
 
     #pragma endregion

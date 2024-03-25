@@ -1,7 +1,7 @@
 #include "functions.h"
 
 Instance CreateInstance(Vector2 _position, Texture2D *_sprite){
-  static int id = 0;
+  static u32 id = 0;
   id++;
   return (Instance){
     .ID = id,
