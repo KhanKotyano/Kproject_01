@@ -8,6 +8,9 @@
 #include "../rlib/raylib.h"
 #define _NEAR_BLACK (Color){15, 15, 15, 255}
 #define _MAX_INSTANCES 32
+#define _TARGET_FPS 60
+#define _MIN_ANIMATION_SPEED 1
+#define _MAX_ANIMATION_SPEED 16
 
 #pragma region Variable Declaration
 typedef signed char s8;
@@ -34,15 +37,28 @@ typedef union {
 	f64 f64;
 } Var;
 #pragma endregion
+typedef struct Animation2D {
+  u8 animation_speed;
+  u8 frame_counter;
+  u8 max_frames;
+  u8 curretnt_frame;
+  Rectangle frame_rectangle;
+  Texture2D *sprite_sheet;
+} Animation2D;
 
 typedef struct Instance {
   u32 ID;
   bool active;
   Vector2 pos {0,0};
   Texture2D *sprite;
-  u8 animation_speed;
   float scale = 1;
   float angle = 0;
+  //u8 animation_speed;
+  //u8 frame_counter;
+  //u8 max_frames;
+  //u8 curretnt_frame;
+  //Rectangle frame_rectangle;
+  Animation2D animation;
 }Instance;
 
 
@@ -70,9 +86,9 @@ struct stack{
 /// @param _sprite 
 /// @param _inst_array 
 /// @return Instance
-Instance CreateInstance(Vector2 _position, Texture2D *_sprite);
+Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation);
 int PlayerIvent(Instance &self);
-void AddInstance( Vector2 _position, Instance *_inst_array, Texture2D *_sprite);
+void AddInstance( Vector2 _position, Instance *_inst_array, Texture2D *_sprite, Animation2D *_animation);
 void UpdateInstances(Instance *_inst_array);
 void UpdateDrawInstances(Instance *_inst_array);
 //Common
@@ -86,8 +102,14 @@ int isFull(struct stack *pt);
 void push(struct stack *pt, int x);
 int peek(struct stack *pt);
 int pop(struct stack *pt);
+//Draw
+void DrawAndAnimate(Instance * _inst);
+//void GetCurrentFrame(Instance *_inst);
+void GetFrameAnimation(Animation2D *_animation);
+void DrawAnimation(Animation2D *_animation, Vector2 _pos);
 //Includes
 #include "f_common.c"
 #include "f_stack.c"
 #include "f_instance.c"
+#include "f_draw.c"
 #endif

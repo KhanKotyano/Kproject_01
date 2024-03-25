@@ -26,7 +26,7 @@ int _a = sizeof(inst_array);
 
 int main(){
   InitWindow(screenWidth, screenHeight, "My Game");
-  SetTargetFPS(60);
+  SetTargetFPS(_TARGET_FPS);
   #pragma region Initialaze Camera
   camera.zoom = 2.0f;
   camera.offset = (Vector2){ screenWidth/2, screenHeight/2};
@@ -42,11 +42,12 @@ int main(){
   #pragma endregion
   #pragma region Load sprites
   Texture2D enemy_sprite = LoadTexture("sprites/red_box.png");
-  Texture2D player_sprite = LoadTexture("sprites/idk.png");
+  //Texture2D player_sprite = LoadTexture("sprites/idk.png");
+  Texture2D player_animation_sprite = LoadTexture("sprites/test3.png");
   #pragma endregion
   #pragma region Create Instance
-  Instance player = CreateInstance(Vector2{0,0}, &player_sprite);
-  // AddInstance(Vector2{26,26}, inst_array, &enemy_sprite);
+  Animation2D player_animation = CreateAnimation2D(&player_animation_sprite);
+  Instance player = CreateInstance(Vector2{0,0}, &player_animation_sprite, &player_animation);
   #pragma endregion
   int number = 0;
   printf(IntToString(_a));
@@ -59,7 +60,7 @@ int main(){
     #pragma region Step Invent
     number = 0;
     if(IsKeyPressed(KEY_R)){
-      AddInstance(GetScreenToWorld2D(GetMousePosition(), camera), inst_array, &enemy_sprite);
+      AddInstance(GetScreenToWorld2D(GetMousePosition(), camera), inst_array, &enemy_sprite, &player_animation);
     }
     PlayerIvent(player);
     UpdateInstances(inst_array);
@@ -82,13 +83,15 @@ int main(){
         char *player_posx = FloatToString(player.pos.y);
         char *player_posy = FloatToString(player.pos.x);
     
-        DrawTextureEx(*player.sprite, player.pos, player.angle, player.scale, GREEN);
+        //DrawTextureEx(*player.sprite, player.pos, player.angle, player.scale, GREEN);
+        DrawAndAnimate(&player);
         DrawText(player_posx, player.pos.x, player.pos.y - 8, 8, BLACK);
         DrawText(player_posy, player.pos.x , player.pos.y- 16, 8, BLACK);
 
         free(player_posx);
         free(player_posy);
       EndMode2D();
+      DrawText(IntToString(player.animation.curretnt_frame), 40,4,24,RED);
       DrawText(IntToString(number), 4,4,24,BLACK);
     EndDrawing();
 

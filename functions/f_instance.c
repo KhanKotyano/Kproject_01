@@ -1,6 +1,6 @@
 #include "functions.h"
 
-Instance CreateInstance(Vector2 _position, Texture2D *_sprite){
+Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation){
   static u32 id = 0;
   id++;
   return (Instance){
@@ -9,15 +9,22 @@ Instance CreateInstance(Vector2 _position, Texture2D *_sprite){
     .pos = _position,
     .sprite = _sprite,
     .scale = 1,
-    .angle = 0
+    .angle = 0,
+    //ANIMATION THING: TODO: MAYBE REMOVE TO A SEPARATE STRUCT
+    //.animation_speed = 8,
+    //.frame_counter = 0,
+    //.max_frames = 5,
+    //.curretnt_frame = 0,
+    //.frame_rectangle = {0.0f, 0.0f, (float)_sprite->width/6, (float)_sprite->height },
+    .animation = *_animation,
   };
 };
-void AddInstance( Vector2 _position, Instance *_inst_array, Texture2D *_sprite){
+void AddInstance( Vector2 _position, Instance *_inst_array, Texture2D *_sprite, Animation2D *_animation){
   for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
     if(_inst_array[i].active){
       continue;
     }
-    _inst_array[i] = CreateInstance(_position, _sprite);
+    _inst_array[i] = CreateInstance(_position, _sprite, _animation);
     return;
   };
 }
