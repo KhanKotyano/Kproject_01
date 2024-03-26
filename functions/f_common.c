@@ -1,5 +1,6 @@
 #include "functions.h"
 
+
 char* FloatToString( float recast ){
     int length = snprintf( NULL, 0, "%g", recast ); 
     char *str = (char*)malloc( length + 1 );
@@ -12,3 +13,5 @@ char* IntToString( int recast ){
     snprintf( str, length + 1, "%d", recast );
     return str;
 }
+
+

@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 #include "../rlib/raylib.h"
 #define _NEAR_BLACK (Color){15, 15, 15, 255}
 #define _MAX_INSTANCES 32
@@ -54,18 +56,19 @@ typedef struct Animation2D {
 } Animation2D;
 
 typedef struct Instance {
-  u32 ID;
+  //Instance *ID;
   bool active;
   Vector2 pos {0,0};
   Texture2D *sprite;
   float scale = 1;
   float angle = 0;
+  Animation2D animation;
+  //Instance *self_ptr;
   //u8 animation_speed;
   //u8 frame_counter;
   //u8 max_frames;
   //u8 curretnt_frame;
   //Rectangle frame_rectangle;
-  Animation2D animation;
 }Instance;
 
 

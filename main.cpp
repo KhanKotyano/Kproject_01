@@ -1,6 +1,8 @@
 //#include <iostream>
-//#include <stdio.h>
-//#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 #include <time.h>
 
 #include "rlib/raylib.h"
@@ -11,18 +13,14 @@
 //Var my_int ;
 
 
-
+Vector2 mouse_world_pos;
 const int screenWidth = 1280;
 const int screenHeight = 720;
 Camera2D camera = { 0 };
 Camera3D camera_3d = { 0 };
 Instance inst_array[_MAX_INSTANCES] = {0};
-
+//Instance *test_inst_array[_MAX_INSTANCES] ;
 int _a = sizeof(inst_array);
-//Instance *_ip;
-//int _b = sizeof(_ip);
-//Instance _ib;
-//int _c = sizeof(_ib);
 
 int main(){
   InitWindow(screenWidth, screenHeight, "My Game");
@@ -48,33 +46,41 @@ int main(){
   #pragma endregion
   #pragma region Create Instance
   Animation2D player_animation = CreateAnimation2D(&player_animation_sprite, 6, _LOW_SPEED_ANIMATION);
-  Animation2D dude_animation = CreateAnimation2D(&dude_animation_sprite, 6, _MIDDLEPLUS_SPEED_ANIMATION);
+  Animation2D dude_animation = CreateAnimation2D(&dude_animation_sprite, 6, _HIGHT_SPEED_ANIMATION-10);
   Instance player = CreateInstance(Vector2{0,0}, &player_animation_sprite, &player_animation);
+  //Instance dude = CreateInstance(Vector2{0,0}, &dude_animation_sprite, &dude_animation);
   #pragma endregion
   int number = 0;
+  printf("Size of main array: ");
   printf(IntToString(_a));
   printf("\n");
   while (!WindowShouldClose()) {
     #pragma region Step Invent
+    mouse_world_pos = GetScreenToWorld2D(GetMousePosition(), camera);
     number = 0;
     if(IsKeyPressed(KEY_R)){
-      AddInstance(GetScreenToWorld2D(GetMousePosition(), camera), inst_array, &enemy_sprite, &dude_animation);
+      AddInstance(mouse_world_pos, inst_array, &enemy_sprite, &dude_animation);
+    }
+    if(IsKeyPressed(KEY_T)){
+
+     //AddInstancePointer(&dude, test_inst_array, mouse_world_pos);
     }
     PlayerIvent(player);
     UpdateInstances(inst_array);
+    #pragma region camera ivent
     camera.target = player.pos;
-    for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
+    #pragma endregion
+     for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
       if(inst_array[i].active){
         number++;
       }
     }; 
-    
     #pragma endregion
     #pragma region Draw event
     BeginDrawing();
       ClearBackground(RAYWHITE);
       BeginMode2D(camera);
-        //number++;
+        //TestUpdateAnimateInstances(test_inst_array);
         UpdateAnimateInstances(inst_array);
         //UpdateDrawInstances(inst_array);
 
