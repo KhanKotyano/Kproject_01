@@ -11,6 +11,7 @@
 
 #include "functions/functions.h"
 //Var my_int ;
+IntArray BigA;
 
 
 Vector2 mouse_world_pos;
@@ -18,11 +19,13 @@ const int screenWidth = 1280;
 const int screenHeight = 720;
 Camera2D camera = { 0 };
 Camera3D camera_3d = { 0 };
-Instance inst_array[_MAX_INSTANCES] = {0};
+InstanceArray inst_array;
+
 //Instance *test_inst_array[_MAX_INSTANCES] ;
-int _a = sizeof(inst_array);
+//int _a = sizeof(inst_array);
 
 int main(){
+  
   InitWindow(screenWidth, screenHeight, "My Game");
   SetTargetFPS(_TARGET_FPS);
   #pragma region Initialaze Camera
@@ -40,9 +43,8 @@ int main(){
   #pragma endregion
   #pragma region Load sprites
   Texture2D enemy_sprite = LoadTexture("sprites/red_box.png");
-  //Texture2D player_sprite = LoadTexture("sprites/idk.png");
-  Texture2D player_animation_sprite = LoadTexture("sprites/test3.png");
-  Texture2D dude_animation_sprite = LoadTexture("sprites/test.png");
+  Texture2D player_animation_sprite = LoadTexture("sprites/player32.png");
+  Texture2D dude_animation_sprite = LoadTexture("sprites/test32.png");
   #pragma endregion
   #pragma region Create Instance
   Animation2D player_animation = CreateAnimation2D(&player_animation_sprite, 6, _LOW_SPEED_ANIMATION);
@@ -51,27 +53,74 @@ int main(){
   //Instance dude = CreateInstance(Vector2{0,0}, &dude_animation_sprite, &dude_animation);
   #pragma endregion
   int number = 0;
+  InitArrayInstance(&inst_array, 16);
+  
+
+  /*
+  InitArrayInt(&BigA, 10);
+  for(int i = 0;i< 10;i++){
+    ArrayPushInt(&BigA, i+12);
+  }
+  for(int i = 0;i< 10;i++){
+    printf(IntToString(i));
+    printf(":");
+    printf(IntToString(BigA.array[i]));
+    printf("\n");
+  }
+  printf("used space:");
+  printf(IntToString((int)BigA.used));
+  printf("\n");
+  //BigA.array[1] = NULL;
+  //BigA.array[0] = _EMPTY;
+  //BigA.array[3] = _EMPTY;
+  //BigA.array[9] = _EMPTY;
+  bool cool = RedoIntArray(&BigA);
+  printf("%s", cool ? "true" : "false");
+  printf("\n");
+  for(int i = 0;i< 10;i++){
+    printf(IntToString(i));
+    printf(":");
+    printf(IntToString(BigA.array[i]));
+    printf("\n");
+  }
+  printf("used space:");
+  printf(IntToString((int)BigA.used));
+  printf("\n");
+
+  printf("Size of array: ");
+  printf(IntToString( BigA.size));
+  printf("\n");
+  
+  freeArrayInt(&BigA);
+  
+  printf("Size of freearray: ");
+  printf(IntToString( BigA.used));
+  printf("\n");
+  
   printf("Size of main array: ");
   printf(IntToString(_a));
   printf("\n");
+  */
+  
+
   while (!WindowShouldClose()) {
     #pragma region Step Invent
     mouse_world_pos = GetScreenToWorld2D(GetMousePosition(), camera);
     number = 0;
     if(IsKeyPressed(KEY_R)){
-      AddInstance(mouse_world_pos, inst_array, &enemy_sprite, &dude_animation);
+      AddInstance(mouse_world_pos, &inst_array, &enemy_sprite, &dude_animation);
     }
     if(IsKeyPressed(KEY_T)){
 
      //AddInstancePointer(&dude, test_inst_array, mouse_world_pos);
     }
     PlayerIvent(player);
-    UpdateInstances(inst_array);
+    UpdateInstances(&inst_array);
     #pragma region camera ivent
     camera.target = player.pos;
     #pragma endregion
-     for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
-      if(inst_array[i].active){
+    for(unsigned int i = 0;i < inst_array.used;i++){
+      if(inst_array.array[i].active){
         number++;
       }
     }; 
@@ -81,7 +130,7 @@ int main(){
       ClearBackground(RAYWHITE);
       BeginMode2D(camera);
         //TestUpdateAnimateInstances(test_inst_array);
-        UpdateAnimateInstances(inst_array);
+        UpdateAnimateInstances(&inst_array);
         //UpdateDrawInstances(inst_array);
 
         char *player_posx = FloatToString(player.pos.y);

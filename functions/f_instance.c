@@ -11,7 +11,7 @@ Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_ani
     .sprite = _sprite,
     .scale = 1,
     .angle = 0,
-    .animation = *_animation,
+    .animation = InheritAnimation2D(_animation, _animation->animation_speed ),
   };
   //Instance *_new_ptr = &_new_instance;
   //_new_instance.ID = _new_ptr;
@@ -31,41 +31,64 @@ Instance InheritInstance(Instance *_inst, Vector2 _new_pos){
   //_new_instance.ID = _new_ptr;
   return _new_instance;
 }
-void AddInstance( Vector2 _position, Instance *_inst_array, Texture2D *_sprite, Animation2D *_animation){
-  for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
-    if(_inst_array[i].active){
-      continue;
+void AddInstance( Vector2 _position, InstanceArray *a, Texture2D *_sprite, Animation2D *_animation){
+  Instance _inst = CreateInstance(_position, _sprite, _animation);
+  //ArrayPushInstance(_inst_array, _inst);
+  if (a->used == a->size) {
+    //TODO: Maybe do it as separate check/function. Rn, it not optimal solution
+    if(a->size < _MAX_INSTANCES){
+      a->size *= 2;
+      a->array = (Instance*)realloc(a->array, a->size * sizeof(Instance));
+      EmptyInstanceArray(a, a->used);
+      printf("New memory allocated to the instance array\n");
+    } else {
+      bool has_free_space = RedoInstanceArray(a);
+      if(!has_free_space){
+        a->size *= 2;
+        a->array = (Instance*)realloc(a->array, a->size * sizeof(Instance));
+        EmptyInstanceArray(a, a->used);
+        printf("New memory allocated to the instance array\n");
+      }
     }
-    _inst_array[i] = CreateInstance(_position, _sprite, _animation);
-    return;
-  };
+  }
+  a->array[a->used++] = _inst;
+  a->array[a->used-1].ID = a->used;
+  _inst = {NULL};
 }
-void UpdateInstances(Instance *_inst_array){
-  for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
-    if(!_inst_array[i].active){
+void UpdateInstances(InstanceArray *_inst_a){
+  size_t _used_size = (size_t)_inst_a->used;
+  for(unsigned int i = 0;i<_used_size;i++){
+    Instance *_cur_inst = &_inst_a->array[i];
+    if(!_cur_inst->active){
       continue;
     }
     //PlayerIvent(_inst_array[i]);
   };
 
 };
-void UpdateDrawInstances(Instance *_inst_array){
-  for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
-    if(!_inst_array[i].active){
-      
+void UpdateDrawInstances(InstanceArray *_inst_a){
+  size_t _used_size = (size_t)_inst_a->used;
+  for(unsigned int i = 0;i<_used_size;i++){
+    Instance *_cur_inst = &_inst_a->array[i];
+    if(!_cur_inst->active){
       continue;
     }
-    DrawTextureEx(*_inst_array[i].sprite, _inst_array[i].pos, _inst_array[i].angle, _inst_array[i].scale, WHITE);
+
+    DrawTextureEx(*_cur_inst->sprite, _cur_inst->pos, _cur_inst->angle, _cur_inst->scale, WHITE);
+
   };
 }
-void UpdateAnimateInstances(Instance *_inst_array){
-  for(unsigned int i = 0;i<_MAX_INSTANCES;i++){
-    if(!_inst_array[i].active){
+void UpdateAnimateInstances(InstanceArray *_inst_a){
+  size_t _used_size = (size_t)_inst_a->used;
+  for(unsigned int i = 0;i<_used_size;i++){
+    Instance *_cur_inst = &_inst_a->array[i];
+    if(!_cur_inst->active){
       
       continue;
     }
-    DrawAndAnimate(&_inst_array[i]);
-    DrawText(IntToString(_inst_array[i].animation.curretnt_frame), _inst_array[i].pos.x, _inst_array[i].pos.y, 8, RED);
+    DrawAndAnimate(_cur_inst);
+    DrawText(IntToString(_cur_inst->animation.curretnt_frame), _cur_inst->pos.x, _cur_inst->pos.y, 8, RED);
+    DrawText(IntToString(_cur_inst->ID), _cur_inst->pos.x +16, _cur_inst->pos.y, 8, GREEN);
   };
 }
 

@@ -9,7 +9,7 @@
 #include <string.h>
 #include "../rlib/raylib.h"
 #define _NEAR_BLACK (Color){15, 15, 15, 255}
-#define _MAX_INSTANCES 32
+#define _MAX_INSTANCES 64
 #define _TARGET_FPS 60
 #define _MIN_ANIMATION_SPEED 1
 #define _MAX_ANIMATION_SPEED 150
@@ -21,6 +21,7 @@
 #define _HIGHT_SPEED_ANIMATION (15*_ANIMATION_FPS_OFFSET)
 #define _VERYHIGHT_SPEED_ANIMATION (20*_ANIMATION_FPS_OFFSET)
 
+#define _EMPTY 0
 #pragma region Variable Declaration
 typedef signed char s8;
 typedef unsigned char u8;
@@ -57,7 +58,8 @@ typedef struct Animation2D {
 
 typedef struct Instance {
   //Instance *ID;
-  bool active;
+  unsigned int ID;
+  u8 active;
   Vector2 pos {0,0};
   Texture2D *sprite;
   float scale = 1;
@@ -83,7 +85,20 @@ struct stack{
     int top;
     int *items;
 }stack;
- 
+
+typedef struct IntArray{
+  int *array;
+  size_t used;
+  size_t size;
+} IntArray;
+
+typedef struct InstanceArray{
+  Instance *array;
+  size_t used;
+  size_t size;
+} InstanceArray;
+
+
 #ifndef KAPI
     #define KAPI       // Functions defined as 'extern' by default (implicit specifiers)
 #endif
@@ -96,11 +111,13 @@ struct stack{
 /// @param _sprite 
 /// @param _inst_array 
 /// @return Instance
-Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation);
+//Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation);
+
 int PlayerIvent(Instance &self);
-void AddInstance( Vector2 _position, Instance *_inst_array, Texture2D *_sprite, Animation2D *_animation);
-void UpdateInstances(Instance *_inst_array);
-void UpdateDrawInstances(Instance *_inst_array);
+void AddInstance( Vector2 _position, InstanceArray *_inst_array, Texture2D *_sprite, Animation2D *_animation);
+void UpdateInstances(InstanceArray *_inst_array);
+void UpdateDrawInstances(InstanceArray *_inst_array);
+
 //Common
 char* FloatToString( float recast );
 char* IntToString( int recast );
@@ -118,9 +135,14 @@ Animation2D InheritAnimation2D(Animation2D *_sourse, u8 _animation_speed);
 void DrawAndAnimate(Instance * _inst);
 void GetFrameAnimation(Animation2D *_animation);
 void DrawAnimation(Animation2D *_animation, Vector2 _pos);
+//Arrays
+bool RedoInstanceArray(InstanceArray *a);
+//void CreateArrayInt(IntArray *a, size_t initialSize);
 //Includes
 #include "f_common.c"
+#include "f_array.c"
 #include "f_stack.c"
 #include "f_instance.c"
 #include "f_draw.c"
+
 #endif

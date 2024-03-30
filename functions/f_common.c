@@ -13,5 +13,3 @@ char* IntToString( int recast ){
     snprintf( str, length + 1, "%d", recast );
     return str;
 }
-
-
