@@ -34,6 +34,14 @@ typedef signed long s64;
 typedef unsigned long u64;
 typedef float f32;
 typedef double f64;
+enum TYPE {
+  NOTHING = 0,
+  PLAYER = 1,
+  ENEMY = 2
+
+};
+
+
 
 typedef union {
 	s8 s8;
@@ -57,6 +65,8 @@ typedef struct Animation2D {
   Texture2D *sprite_sheet;
 } Animation2D;
 
+
+
 typedef struct Instance {
   //Instance *ID;
   u32 ID;
@@ -66,6 +76,12 @@ typedef struct Instance {
   float scale = 1;
   float angle = 0;
   Animation2D animation;
+  void (**f_array)(Instance*);
+  u8 f_size;
+  void (**f_draw_array)(Instance*);
+  u8 f_draw_size;
+  u16 type;
+  //void (**function)(Instance*);
   //Instance *self_ptr;
   //u8 animation_speed;
   //u8 frame_counter;
@@ -74,7 +90,6 @@ typedef struct Instance {
   //Rectangle frame_rectangle;
 }Instance;
 
-
 typedef struct Instance3D {
   Vector3 pos;
   Texture *sprite;
@@ -82,9 +97,9 @@ typedef struct Instance3D {
 }Instance3D;
 
 struct stack{
-    int maxsize;    // define max capacity of the stack
-    int top;
-    int *items;
+  int maxsize;    // define max capacity of the stack
+  int top;
+  int *items;
 }stack;
 
 typedef struct IntArray{
@@ -113,12 +128,13 @@ typedef struct InstanceArray{
 /// @param _inst_array 
 /// @return Instance
 //Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation);
-
-int PlayerIvent(Instance &self);
+void DrawSelf(Instance *self);
+void AnimateSelf(Instance *self);
+void PlayerIvent(Instance *self);
 void AddInstance( Vector2 _position, InstanceArray *_inst_array, Texture2D *_sprite, Animation2D *_animation);
 void UpdateInstances(InstanceArray *_inst_array);
 void UpdateDrawInstances(InstanceArray *_inst_array);
-
+//void AssignTypeFunctions(void(**_function_array)(Instance*), u16 _type);
 //Common
 char* FloatToString( float recast );
 char* IntToString( int recast );

@@ -20,7 +20,6 @@ const int screenHeight = 720;
 Camera2D camera = { 0 };
 Camera3D camera_3d = { 0 };
 InstanceArray inst_array;
-//char *text0;
 
 //Instance *test_inst_array[_MAX_INSTANCES] ;
 //int _a = sizeof(inst_array);
@@ -50,12 +49,11 @@ int main(){
   #pragma region Create Instance
   Animation2D player_animation = CreateAnimation2D(&player_animation_sprite, 6, _LOW_SPEED_ANIMATION);
   Animation2D dude_animation = CreateAnimation2D(&dude_animation_sprite, 6, _HIGHT_SPEED_ANIMATION-10);
-  Instance player = CreateInstance(Vector2{0,0}, &player_animation_sprite, &player_animation);
-  //Instance dude = CreateInstance(Vector2{0,0}, &dude_animation_sprite, &dude_animation);
+  //void(*array[])(Instance*) = {&PlayerIvent};
+  Instance player = CreateInstanceType(Vector2{0,0}, &player_animation_sprite, &player_animation, TYPE::PLAYER);
   #pragma endregion
   int number = 0;
   InitArrayInstance(&inst_array, 16);
-  
 
   /*
   InitArrayInt(&BigA, 10);
@@ -103,20 +101,22 @@ int main(){
   printf("\n");
   */
   
+  //player.function = &PlayerIvent;
 
   while (!WindowShouldClose()) {
     #pragma region Step Invent
     mouse_world_pos = GetScreenToWorld2D(GetMousePosition(), camera);
     number = 0;
     if(IsKeyPressed(KEY_R)){
-      AddInstance(mouse_world_pos, &inst_array, &enemy_sprite, &dude_animation);
+      AddInstanceType(mouse_world_pos, &inst_array, &enemy_sprite, &dude_animation, TYPE::ENEMY);
     }
     if(IsKeyPressed(KEY_T)){
       int rd = GetRandomValue(0, inst_array.used-1);
       inst_array.array[rd] = {0};
      //AddInstancePointer(&dude, test_inst_array, mouse_world_pos);
     }
-    PlayerIvent(player);
+    //PlayerIvent(&player);
+    player.f_array[0](&player);
     UpdateInstances(&inst_array);
     #pragma region camera ivent
     camera.target = player.pos;
@@ -131,11 +131,10 @@ int main(){
     BeginDrawing();
       ClearBackground(RAYWHITE);
       BeginMode2D(camera);
-        //TestUpdateAnimateInstances(test_inst_array);
-        UpdateAnimateInstances(&inst_array);
-        //UpdateDrawInstances(inst_array);
-
-        DrawAndAnimate(&player);
+        //UpdateAnimateInstances(&inst_array);
+        UpdateDrawInstances(&inst_array);
+        player.f_draw_array[0](&player);
+        //DrawAndAnimate(&player);
         DrawText(TextFormat("%g",player.pos.y), player.pos.x, player.pos.y - 8, 8, BLACK);
         DrawText(TextFormat("%g",player.pos.x), player.pos.x , player.pos.y- 16, 8, BLACK);
 
