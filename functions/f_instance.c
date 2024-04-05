@@ -21,6 +21,9 @@ Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_ani
   id++;
   return _new_instance;
 };
+void DrawSelf(Instance *self){
+  DrawTextureEx(*self->sprite, self->pos, self->angle,self->scale, WHITE);
+};
 Instance CreateInstanceEXT(Vector2 _position, Texture2D *_sprite, Animation2D *_animation
                           ,void (**_function_array)(Instance*), int _f_size){
   static u32 id = _INSTANCE_ID;
@@ -67,6 +70,7 @@ u8 AssignDrawFunctions(void(***_function_array)(Instance*), u16 _type){
       f_size = 1;
       *_function_array = (void(**)(Instance*))malloc(f_size * sizeof(void*));
       *_function_array[0] = &DrawAndAnimate;
+      //*_function_array[0] = &DrawSelf;
 
     }break;
     case TYPE::ENEMY:{
@@ -205,19 +209,17 @@ void UpdateAnimateInstances(InstanceArray *_inst_a){
     DrawText(TextFormat("%i",_cur_inst->ID - _INSTANCE_ID), _cur_inst->pos.x +16, _cur_inst->pos.y, 8, GREEN);
   };
 }
-void DrawSelf(Instance *self){
 
-};
 
 
 void PlayerIvent(Instance *self){
   if(IsKeyDown(KEY_UP)){
     self->pos.y -= 1;
-    //self.scale -= 0.005f;
+    self->scale -= 0.005f;
   }
   if(IsKeyDown(KEY_DOWN)){
     self->pos.y += 1;
-   // self.scale += 0.005f;
+    self->scale += 0.005f;
   }
   if(IsKeyDown(KEY_LEFT)){
     self->pos.x -= 1;

@@ -116,6 +116,7 @@ int main(){
      //AddInstancePointer(&dude, test_inst_array, mouse_world_pos);
     }
     //PlayerIvent(&player);
+    
     player.f_array[0](&player);
     UpdateInstances(&inst_array);
     #pragma region camera ivent
@@ -130,6 +131,9 @@ int main(){
     #pragma region Draw event
     BeginDrawing();
       ClearBackground(RAYWHITE);
+      BeginMode3D(camera_3d);
+        DrawGrid(50, 1);
+      EndMode3D();
       BeginMode2D(camera);
         //UpdateAnimateInstances(&inst_array);
         UpdateDrawInstances(&inst_array);

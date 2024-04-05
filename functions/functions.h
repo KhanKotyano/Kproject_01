@@ -163,7 +163,8 @@ int FindNotEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
 #include "f_common.c"
 #include "f_array.c"
 #include "f_stack.c"
-#include "f_instance.c"
 #include "f_draw.c"
+#include "f_instance.c"
+
 
 #endif
