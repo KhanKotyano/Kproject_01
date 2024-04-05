@@ -86,27 +86,15 @@ void InitArrayInstance(InstanceArray *a, size_t initialSize) {
   EmptyInstanceArray(a, 0);
 };
 void ArrayPushInstance(InstanceArray *a, Instance _instance) {
-  // a->used is the number of used entries, because a->array[a->used++] updates a->used only *after* the array has been accessed.
-  // Therefore a->used can go up to a->size 
   if (a->used == a->size) {
     //TODO: Maybe do it as separate check/function. Rn, it not optimal solution
-    if(a->size < _MAX_INSTANCES){
-      a->size *= 2;
-      a->array = (Instance*)realloc(a->array, a->size * sizeof(Instance));
-      EmptyInstanceArray(a, a->used);
-      printf("New memory allocated to the instance array\n");
-    } else {
-      bool has_free_space = RedoInstanceArray(a);
-      if(!has_free_space){
-        a->size *= 2;
-        a->array = (Instance*)realloc(a->array, a->size * sizeof(Instance));
-        EmptyInstanceArray(a, a->used);
-        printf("New memory allocated to the instance array\n");
-      }
-    }
+    a->size *= 2;
+    a->array = (Instance*)realloc(a->array, a->size * sizeof(Instance));
+    EmptyInstanceArray(a, a->used);
+    printf("New memory allocated to the instance array\n");
   }
   a->array[a->used++] = _instance;
-  a->array[a->used-1].ID = a->used;
+  //a->array[a->used-1].ID = a->used;
 }
 
 
@@ -119,17 +107,25 @@ void ArraySetIndexInstance(InstanceArray *a, int _index, Instance _instance){
 
 int FindNotEmptyInstance(Instance *array, s32 _offset, s32 _max_lng){
   for(s32 i = _offset;i < _max_lng;i++){
-    if(array[i].active != _EMPTY){
+    if(array[i].exist != _EMPTY){
       return i;
     }
   }
   return -1;
   
 }
+int FindEmptyInstance(Instance *array, s32 _offset, s32 _max_lng){
+  for(s32 i = _offset;i < _max_lng;i++){
+    if(array[i].exist == _EMPTY){
+      return i;
+    }
+  }
+  return -1;
+}
 bool RedoInstanceArray(InstanceArray *a){
   int _counter = 0;
   for(s32 i = 0;i < (s32)a->used;i++){
-    if(a->array[i].active == _EMPTY){
+    if(a->array[i].exist == _EMPTY){
       _counter = i;
       int _empty_index = FindNotEmptyInstance(a->array, i, a->used);
       if(_empty_index != -1){

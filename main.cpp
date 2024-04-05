@@ -20,6 +20,7 @@ const int screenHeight = 720;
 Camera2D camera = { 0 };
 Camera3D camera_3d = { 0 };
 InstanceArray inst_array;
+//char *text0;
 
 //Instance *test_inst_array[_MAX_INSTANCES] ;
 //int _a = sizeof(inst_array);
@@ -111,7 +112,8 @@ int main(){
       AddInstance(mouse_world_pos, &inst_array, &enemy_sprite, &dude_animation);
     }
     if(IsKeyPressed(KEY_T)){
-
+      int rd = GetRandomValue(0, inst_array.used-1);
+      inst_array.array[rd] = {0};
      //AddInstancePointer(&dude, test_inst_array, mouse_world_pos);
     }
     PlayerIvent(player);
@@ -120,7 +122,7 @@ int main(){
     camera.target = player.pos;
     #pragma endregion
     for(unsigned int i = 0;i < inst_array.used;i++){
-      if(inst_array.array[i].active){
+      if(inst_array.array[i].exist){
         number++;
       }
     }; 
@@ -133,19 +135,15 @@ int main(){
         UpdateAnimateInstances(&inst_array);
         //UpdateDrawInstances(inst_array);
 
-        char *player_posx = FloatToString(player.pos.y);
-        char *player_posy = FloatToString(player.pos.x);
-    
-        //DrawTextureEx(*player.sprite, player.pos, player.angle, player.scale, GREEN);
         DrawAndAnimate(&player);
-        DrawText(player_posx, player.pos.x, player.pos.y - 8, 8, BLACK);
-        DrawText(player_posy, player.pos.x , player.pos.y- 16, 8, BLACK);
+        DrawText(TextFormat("%g",player.pos.y), player.pos.x, player.pos.y - 8, 8, BLACK);
+        DrawText(TextFormat("%g",player.pos.x), player.pos.x , player.pos.y- 16, 8, BLACK);
 
-        free(player_posx);
-        free(player_posy);
+        
       EndMode2D();
-      DrawText(IntToString(player.animation.curretnt_frame), 40,4,24,RED);
-      DrawText(IntToString(number), 4,4,24,BLACK);
+      DrawText(TextFormat("%i", player.animation.curretnt_frame), 40,4,24,RED);
+      DrawText(TextFormat("%i",number), 4,4,24,BLACK);
+      
     EndDrawing();
 
     #pragma endregion

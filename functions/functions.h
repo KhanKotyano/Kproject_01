@@ -9,7 +9,7 @@
 #include <string.h>
 #include "../rlib/raylib.h"
 #define _NEAR_BLACK (Color){15, 15, 15, 255}
-#define _MAX_INSTANCES 64
+#define _MAX_INSTANCES 16
 #define _TARGET_FPS 60
 #define _MIN_ANIMATION_SPEED 1
 #define _MAX_ANIMATION_SPEED 150
@@ -20,6 +20,7 @@
 #define _MIDDLEPLUS_SPEED_ANIMATION (12*_ANIMATION_FPS_OFFSET)
 #define _HIGHT_SPEED_ANIMATION (15*_ANIMATION_FPS_OFFSET)
 #define _VERYHIGHT_SPEED_ANIMATION (20*_ANIMATION_FPS_OFFSET)
+#define _INSTANCE_ID 1000000000
 
 #define _EMPTY 0
 #pragma region Variable Declaration
@@ -58,8 +59,8 @@ typedef struct Animation2D {
 
 typedef struct Instance {
   //Instance *ID;
-  unsigned int ID;
-  u8 active;
+  u32 ID;
+  u8 exist;
   Vector2 pos {0,0};
   Texture2D *sprite;
   float scale = 1;
@@ -121,6 +122,8 @@ void UpdateDrawInstances(InstanceArray *_inst_array);
 //Common
 char* FloatToString( float recast );
 char* IntToString( int recast );
+//char* ToStringInt( int recast , char *str);
+//char* ToStringFloat( float recast , char *str);
 //Stack
 struct stack* newStack(int capacity);
 int size(struct stack *pt);
@@ -137,6 +140,8 @@ void GetFrameAnimation(Animation2D *_animation);
 void DrawAnimation(Animation2D *_animation, Vector2 _pos);
 //Arrays
 bool RedoInstanceArray(InstanceArray *a);
+int FindEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
+int FindNotEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
 //void CreateArrayInt(IntArray *a, size_t initialSize);
 //Includes
 #include "f_common.c"

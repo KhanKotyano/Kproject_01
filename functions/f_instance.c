@@ -1,12 +1,11 @@
 #include "functions.h"
 
 Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation){
-  //static u32 id = 0;
-  //id++;
-  
+  static u32 id = _INSTANCE_ID;
+  //id << 32;
   Instance _new_instance = {
-    //.ID = id,
-    .active = true,
+    .ID = id,
+    .exist = true,
     .pos = _position,
     .sprite = _sprite,
     .scale = 1,
@@ -15,18 +14,13 @@ Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_ani
   };
   //Instance *_new_ptr = &_new_instance;
   //_new_instance.ID = _new_ptr;
+  id++;
   return _new_instance;
 };
 Instance InheritInstance(Instance *_inst, Vector2 _new_pos){
-  Instance _new_instance = {
-    //.ID = _inst->ID << 24,
-    .active = _inst->active,
-    .pos = _new_pos,
-    .sprite = _inst->sprite,
-    .scale = _inst->scale,
-    .angle = _inst->angle,
-    .animation = _inst->animation,
-  };
+  Instance _new_instance = CreateInstance(_inst->pos, _inst->sprite, &_inst->animation);
+  _new_instance.scale = _inst->scale;
+  _new_instance.angle = _inst->angle;
   //Instance *_new_ptr = &_new_instance;
   //_new_instance.ID = _new_ptr;
   return _new_instance;
@@ -42,24 +36,28 @@ void AddInstance( Vector2 _position, InstanceArray *a, Texture2D *_sprite, Anima
       EmptyInstanceArray(a, a->used);
       printf("New memory allocated to the instance array\n");
     } else {
-      bool has_free_space = RedoInstanceArray(a);
-      if(!has_free_space){
+      int _free_index = FindEmptyInstance(a->array, 0, (s32)a->used);
+      if(_free_index != -1){
+          a->array[_free_index] = _inst;
+          return;
+      } else {
         a->size *= 2;
         a->array = (Instance*)realloc(a->array, a->size * sizeof(Instance));
         EmptyInstanceArray(a, a->used);
         printf("New memory allocated to the instance array\n");
       }
     }
-  }
+  } 
   a->array[a->used++] = _inst;
-  a->array[a->used-1].ID = a->used;
+  //a->array[a->used-1].ID = a->used;
   _inst = {NULL};
 }
+
 void UpdateInstances(InstanceArray *_inst_a){
   size_t _used_size = (size_t)_inst_a->used;
   for(unsigned int i = 0;i<_used_size;i++){
     Instance *_cur_inst = &_inst_a->array[i];
-    if(!_cur_inst->active){
+    if(!_cur_inst->exist){
       continue;
     }
     //PlayerIvent(_inst_array[i]);
@@ -70,7 +68,7 @@ void UpdateDrawInstances(InstanceArray *_inst_a){
   size_t _used_size = (size_t)_inst_a->used;
   for(unsigned int i = 0;i<_used_size;i++){
     Instance *_cur_inst = &_inst_a->array[i];
-    if(!_cur_inst->active){
+    if(!_cur_inst->exist){
       continue;
     }
 
@@ -82,13 +80,13 @@ void UpdateAnimateInstances(InstanceArray *_inst_a){
   size_t _used_size = (size_t)_inst_a->used;
   for(unsigned int i = 0;i<_used_size;i++){
     Instance *_cur_inst = &_inst_a->array[i];
-    if(!_cur_inst->active){
+    if(!_cur_inst->exist){
       
       continue;
     }
     DrawAndAnimate(_cur_inst);
-    DrawText(IntToString(_cur_inst->animation.curretnt_frame), _cur_inst->pos.x, _cur_inst->pos.y, 8, RED);
-    DrawText(IntToString(_cur_inst->ID), _cur_inst->pos.x +16, _cur_inst->pos.y, 8, GREEN);
+    DrawText(TextFormat("%i", _cur_inst->animation.curretnt_frame), _cur_inst->pos.x, _cur_inst->pos.y, 8, RED);
+    DrawText(TextFormat("%i",_cur_inst->ID - _INSTANCE_ID), _cur_inst->pos.x +16, _cur_inst->pos.y, 8, GREEN);
   };
 }
 
