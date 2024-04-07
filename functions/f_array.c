@@ -99,7 +99,7 @@ void ArrayPushInstance(InstanceArray *a, Instance _instance) {
 
 
 void ArrayEmptyIndexInstance(InstanceArray *a, int _index){
-  a->array[_index] = {_EMPTY};
+  a->array[_index] = {0};
 }
 void ArraySetIndexInstance(InstanceArray *a, int _index, Instance _instance){
   a->array[_index] = _instance;

@@ -41,8 +41,6 @@ enum TYPE {
 
 };
 
-
-
 typedef union {
 	s8 s8;
 	u8 u8;
@@ -71,10 +69,10 @@ typedef struct Instance {
   //Instance *ID;
   u32 ID;
   u8 exist;
-  Vector2 pos {0,0};
+  Vector2 pos ;
   Texture2D *sprite;
-  float scale = 1;
-  float angle = 0;
+  float scale ;
+  float angle ;
   Animation2D animation;
   void (**f_array)(Instance*);
   u8 f_size;
@@ -165,6 +163,6 @@ int FindNotEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
 #include "f_stack.c"
 #include "f_draw.c"
 #include "f_instance.c"
-
+//#include "f_UI.c"
 
 #endif

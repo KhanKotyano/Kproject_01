@@ -10,7 +10,6 @@
 #include "rlib/rlgl.h"
 
 #include "functions/functions.h"
-//Var my_int ;
 IntArray BigA;
 
 
@@ -54,54 +53,6 @@ int main(){
   #pragma endregion
   int number = 0;
   InitArrayInstance(&inst_array, 16);
-
-  /*
-  InitArrayInt(&BigA, 10);
-  for(int i = 0;i< 10;i++){
-    ArrayPushInt(&BigA, i+12);
-  }
-  for(int i = 0;i< 10;i++){
-    printf(IntToString(i));
-    printf(":");
-    printf(IntToString(BigA.array[i]));
-    printf("\n");
-  }
-  printf("used space:");
-  printf(IntToString((int)BigA.used));
-  printf("\n");
-  //BigA.array[1] = NULL;
-  //BigA.array[0] = _EMPTY;
-  //BigA.array[3] = _EMPTY;
-  //BigA.array[9] = _EMPTY;
-  bool cool = RedoIntArray(&BigA);
-  printf("%s", cool ? "true" : "false");
-  printf("\n");
-  for(int i = 0;i< 10;i++){
-    printf(IntToString(i));
-    printf(":");
-    printf(IntToString(BigA.array[i]));
-    printf("\n");
-  }
-  printf("used space:");
-  printf(IntToString((int)BigA.used));
-  printf("\n");
-
-  printf("Size of array: ");
-  printf(IntToString( BigA.size));
-  printf("\n");
-  
-  freeArrayInt(&BigA);
-  
-  printf("Size of freearray: ");
-  printf(IntToString( BigA.used));
-  printf("\n");
-  
-  printf("Size of main array: ");
-  printf(IntToString(_a));
-  printf("\n");
-  */
-  
-  //player.function = &PlayerIvent;
 
   while (!WindowShouldClose()) {
     #pragma region Step Invent
