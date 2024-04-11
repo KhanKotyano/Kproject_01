@@ -34,25 +34,36 @@ typedef signed long s64;
 typedef unsigned long u64;
 typedef float f32;
 typedef double f64;
-enum TYPE {
+enum INST_TYPE {
   NOTHING = 0,
   PLAYER = 1,
   ENEMY = 2
 
 };
+enum P_TYPE{
+  PT_VOID = 0,
+  PT_CHAR = 1,
+  PT_UCHAR = 2,
+  PT_INT = 3,
+  PT_UINT = 4,
+  PT_FLOAT = 5,
+  PT_DOUBLE = 6,
 
-typedef union {
-	s8 s8;
-	u8 u8;
-	s16 s16;
-	u16 u16;
-	s32 s32;
-	u32 u32;
-	s64 s64;
-	u64 u64;
-	f32 f32;
-	f64 f64;
-} Var;
+};
+typedef struct custom_pointer {
+  u8 pointer_type;
+  union {
+    void *p_void;
+    char *p_char;
+    unsigned char *p_uchar;
+    int *p_int;
+    unsigned int *p_uint;
+    float *p_float;
+    double *p_double;
+  };
+
+} custom_pointer;
+
 #pragma endregion
 typedef struct Animation2D {
   u8 animation_speed;
@@ -74,12 +85,12 @@ typedef struct Instance {
   float scale ;
   float angle ;
   Animation2D animation;
-  void (**f_array)(Instance*);
-  u8 f_size;
-  void (**f_draw_array)(Instance*);
-  u8 f_draw_size;
+  void (*f_main)(Instance*);
+  void (*f_draw)(Instance*);
+  void (*f_drawGUI)(Instance*);
+  //void (*f_main)(Instance*);
+  //void (*f_main_draw)(Instance*);
   u16 type;
-  //void (**function)(Instance*);
   //Instance *self_ptr;
   //u8 animation_speed;
   //u8 frame_counter;
@@ -128,7 +139,7 @@ typedef struct InstanceArray{
 //Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation);
 void DrawSelf(Instance *self);
 void AnimateSelf(Instance *self);
-void PlayerIvent(Instance *self);
+//void PlayerIvent(Instance *self);
 void AddInstance( Vector2 _position, InstanceArray *_inst_array, Texture2D *_sprite, Animation2D *_animation);
 void UpdateInstances(InstanceArray *_inst_array);
 void UpdateDrawInstances(InstanceArray *_inst_array);
@@ -162,6 +173,8 @@ int FindNotEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
 #include "f_array.c"
 #include "f_stack.c"
 #include "f_draw.c"
+#include "f_inst_step_ivent.c"
+#include "f_inst_draw_ivent.c"
 #include "f_instance.c"
 //#include "f_UI.c"
 

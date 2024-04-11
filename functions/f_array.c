@@ -11,7 +11,7 @@ void EmptyIntArray(IntArray *a, int _offset){
   for(int i = _offset;i< (int)a->size;i++){
     a->array[i] = _EMPTY;
   }
-}
+};
 void InitArrayInt(IntArray *a, size_t initialSize) {
   a->array = (int*)malloc(initialSize * sizeof(int));
   a->used = 0;

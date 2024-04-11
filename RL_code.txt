@@ -1,15 +1,54 @@
-if(IsKeyDown(KEY_UP)){
-      posY -= 1;
-}
-if(IsKeyDown(KEY_DOWN)){
-    posY += 1;
-}
-if(IsKeyDown(KEY_LEFT)){
-    posX -= 1;
-}
-if(IsKeyDown(KEY_RIGHT)){
-    posX += 1;
-}
-if (IsKeyDown(KEY_A)) {
-    camera.rotation--;
-} else if (IsKeyDown(KEY_S)) {camera.rotation++;}
+/*
+u8 AssignFunctions(void(***_function_array)(Instance*), u16 _type){
+  u8 f_size = 0;
+  switch(_type){
+    case PLAYER:{
+      f_size = 1;
+      *_function_array = (void(**)(Instance*))malloc(f_size * sizeof(void*));
+      *_function_array[0] = &PlayerMain;
+
+    }break;
+    case ENEMY:{
+    
+
+    }break;
+  }
+  return f_size;
+};
+u8 AssignDrawFunctions(void(***_function_array)(Instance*), u16 _type){
+  u8 f_size = 0;
+  switch(_type){
+    case PLAYER:{
+      f_size = 1;
+      *_function_array = (void(**)(Instance*))malloc( f_size * sizeof(void*));
+      *_function_array[0] = &PlayerMainDraw;
+      *_function_array[1] = &DrawAndAnimate;
+     
+      *_function_array[0] = &DrawSelf;
+
+    }break;
+    case ENEMY:{
+      f_size = 1;
+      *_function_array = (void(**)(Instance*))malloc(f_size * sizeof(void*));
+
+    }break;
+  }
+  return f_size;
+};
+u8 AssignDrawGUIFunctions(void(***_function_array)(Instance*), u16 _type){
+  u8 f_size = 0;
+  switch(_type){
+    case PLAYER:{
+      f_size = 1;
+      *_function_array = (void(**)(Instance*))malloc(f_size * sizeof(void*));
+      *_function_array[0] = &PlayerMainDrawGui;
+    }break;
+    case ENEMY:{
+      f_size = 1;
+      *_function_array = (void(**)(Instance*))malloc(f_size * sizeof(void*));
+      *_function_array[0] = &DrawAndAnimate;
+    }break;
+  }
+  return f_size;
+};
+*/
