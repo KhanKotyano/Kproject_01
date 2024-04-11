@@ -34,6 +34,8 @@ typedef signed long s64;
 typedef unsigned long u64;
 typedef float f32;
 typedef double f64;
+//typedef static global;
+
 enum INST_TYPE {
   NOTHING = 0,
   PLAYER = 1,
@@ -77,11 +79,10 @@ typedef struct Animation2D {
 
 
 typedef struct Instance {
-  //Instance *ID;
   u32 ID;
   u8 exist;
   Vector2 pos ;
-  Texture2D *sprite;
+  //Texture2D *sprite;
   float scale ;
   float angle ;
   Animation2D animation;
@@ -91,12 +92,6 @@ typedef struct Instance {
   //void (*f_main)(Instance*);
   //void (*f_main_draw)(Instance*);
   u16 type;
-  //Instance *self_ptr;
-  //u8 animation_speed;
-  //u8 frame_counter;
-  //u8 max_frames;
-  //u8 curretnt_frame;
-  //Rectangle frame_rectangle;
 }Instance;
 
 typedef struct Instance3D {
@@ -131,12 +126,7 @@ typedef struct InstanceArray{
 
 
 //Instances
-/// @brief 
-/// @param _position 
-/// @param _sprite 
-/// @param _inst_array 
-/// @return Instance
-//Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation);
+void DumpFunction(Instance *self);
 void DrawSelf(Instance *self);
 void AnimateSelf(Instance *self);
 //void PlayerIvent(Instance *self);

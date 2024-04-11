@@ -22,3 +22,18 @@ void EnemyMainIvent(Instance *self){
 
 }
 void DumpFunction(Instance *self){return;};
+
+void AssignFunction(void(**function)(Instance*), u16 _type){
+  switch(_type){
+    case PLAYER:{
+      *function = &PlayerMain;
+    }break;
+    case ENEMY:{
+      *function = &DumpFunction;
+    }break;
+    default:{
+      *function = &DumpFunction;
+    }break;
+  }
+  
+};

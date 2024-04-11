@@ -50,11 +50,11 @@ Animation2D InheritAnimation2D(Animation2D *_sourse, u8 _animation_speed){
 
 void DrawAndAnimate(Instance *_inst){
     GetFrameAnimation(&_inst->animation);
-    //GetCurrentFrame(_inst);
-    //Texture2D *_temp = _inst->sprite;
     DrawTextureRec(*_inst->animation.sprite_sheet,_inst->animation.frame_rectangle, _inst->pos, (Color){255,255,255,255});
 };
-
+void DrawSelf(Instance *self){
+  DrawTextureRec(*self->animation.sprite_sheet,self->animation.frame_rectangle, self->pos, WHITE);
+};
 void GetFrameAnimation(Animation2D *_animation){
     _animation->frame_counter++;
     if(_animation->frame_counter >= ((_TARGET_FPS*_ANIMATION_FPS_OFFSET)/_animation->animation_speed)){
@@ -67,6 +67,5 @@ void GetFrameAnimation(Animation2D *_animation){
 
 void DrawAnimation(Animation2D *_animation, Vector2 _pos){
     GetFrameAnimation(_animation);
-    //Texture2D *_temp = _inst->sprite;
     DrawTextureRec(*_animation->sprite_sheet,_animation->frame_rectangle, _pos, (Color){255,255,255,255});
 }

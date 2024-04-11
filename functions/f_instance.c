@@ -1,59 +1,27 @@
 #include "functions.h"
-void AssignFunction(void(**function)(Instance*), u16 _type){
-  switch(_type){
-    case PLAYER:{
-      *function = &PlayerMain;
-    }break;
-    case ENEMY:{
-      *function = &DumpFunction;
-    }break;
-    default:{
-      *function = &DumpFunction;
-    }break;
-  }
-  
-};
-void AssignDrawFunction(void(**function)(Instance*), u16 _type){
-  switch(_type){
-    case PLAYER:{
-      *function = &DrawAndAnimate;
-      
-    }break;
-    case ENEMY:{
-      *function = &DrawAndAnimate;
-      
-    }break;
-    default:{
-      *function = &DumpFunction;
-    }
-  }
-};
-Instance CreateInstanceType(Vector2 _position, Texture2D *_sprite, Animation2D *_animation, u16 _type){
+Instance CreateInstanceType(Vector2 _position, Animation2D *_animation, u16 _type){
   static u32 id = _INSTANCE_ID;
   Instance _new_instance = {
     .ID = id,
     .exist = true,
     .pos = _position,
-    .sprite = _sprite,
     .scale = 1,
     .angle = 0,
     .animation = InheritAnimation2D(_animation, _animation->animation_speed ),
   };
   AssignFunction(&_new_instance.f_main, _type);
   AssignDrawFunction(&_new_instance.f_draw, _type);
+  AssignDrawGUIFunction(&_new_instance.f_drawGUI, _type);
   id++;
   return _new_instance;
 };
 
-Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_animation){
+Instance CreateInstance(Vector2 _position, Animation2D *_animation){
   static u32 id = _INSTANCE_ID;
-  //id << 32;
-
   Instance _new_instance = {
     .ID = id,
     .exist = true,
     .pos = _position,
-    .sprite = _sprite,
     .scale = 1,
     .angle = 0,
     .animation = InheritAnimation2D(_animation, _animation->animation_speed ),
@@ -62,17 +30,14 @@ Instance CreateInstance(Vector2 _position, Texture2D *_sprite, Animation2D *_ani
   id++;
   return _new_instance;
 };
-void DrawSelf(Instance *self){
-  DrawTextureEx(*self->sprite, self->pos, self->angle,self->scale, WHITE);
-};
-Instance CreateInstanceEXT(Vector2 _position, Texture2D *_sprite, Animation2D *_animation
+
+Instance CreateInstanceEXT(Vector2 _position, Animation2D *_animation
                           ,void (**_function_array)(Instance*), int _f_size){
   static u32 id = _INSTANCE_ID;
   Instance _new_instance = {
     .ID = id,
     .exist = true,
     .pos = _position,
-    .sprite = _sprite,
     .scale = 1,
     .angle = 0,
     .animation = InheritAnimation2D(_animation, _animation->animation_speed ),
@@ -87,15 +52,15 @@ Instance CreateInstanceEXT(Vector2 _position, Texture2D *_sprite, Animation2D *_
 
 
 Instance InheritInstance(Instance *_inst, Vector2 _new_pos){
-  Instance _new_instance = CreateInstance(_inst->pos, _inst->sprite, &_inst->animation);
+  Instance _new_instance = CreateInstance(_inst->pos,  &_inst->animation);
   _new_instance.scale = _inst->scale;
   _new_instance.angle = _inst->angle;
   //Instance *_new_ptr = &_new_instance;
   //_new_instance.ID = _new_ptr;
   return _new_instance;
 }
-void AddInstance( Vector2 _position, InstanceArray *a, Texture2D *_sprite, Animation2D *_animation){
-  Instance _inst = CreateInstance(_position, _sprite, _animation);
+void AddInstance( Vector2 _position, InstanceArray *a, Animation2D *_animation){
+  Instance _inst = CreateInstance(_position, _animation);
   //ArrayPushInstance(_inst_array, _inst);
   if (a->used == a->size) {
     //TODO: Maybe do it as separate check/function. Rn, it not optimal solution
@@ -121,8 +86,8 @@ void AddInstance( Vector2 _position, InstanceArray *a, Texture2D *_sprite, Anima
   //a->array[a->used-1].ID = a->used;
   _inst = {NULL};
 }
-void AddInstanceType( Vector2 _position, InstanceArray *a, Texture2D *_sprite, Animation2D *_animation, u16 _type){
-  Instance _inst = CreateInstanceType(_position, _sprite, _animation, _type);
+void AddInstanceType( Vector2 _position, InstanceArray *a, Animation2D *_animation, u16 _type){
+  Instance _inst = CreateInstanceType(_position, _animation, _type);
   //ArrayPushInstance(_inst_array, _inst);
   if (a->used == a->size) {
     //TODO: Maybe do it as separate check/function. Rn, it not optimal solution
