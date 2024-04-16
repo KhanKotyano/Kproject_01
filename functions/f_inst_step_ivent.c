@@ -1,5 +1,6 @@
 #include "functions.h"
 void PlayerMain(Instance *self){
+    //self->depth = GetRandomValue(1, 100);
     if(IsKeyDown(KEY_UP)){
     self->pos.y -= 1;
     //self->scale -= 0.005f;

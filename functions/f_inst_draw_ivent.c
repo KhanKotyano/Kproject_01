@@ -6,8 +6,7 @@ void PlayerMainDraw(Instance *self){
 };
 void PlayerMainDrawGui(Instance *self){
     DrawText(TextFormat("%i", self->animation.curretnt_frame), 40,4,24,RED);
-};
-
+}
 
 
 

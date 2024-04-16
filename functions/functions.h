@@ -1,7 +1,6 @@
 #ifndef _KFUNCTIONS_H
 #define _KFUNCTIONS_H
-//#include "f_stack.c"
-//#include "f_common.c"
+//#include "UIC.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +21,10 @@
 #define _VERYHIGHT_SPEED_ANIMATION (20*_ANIMATION_FPS_OFFSET)
 #define _INSTANCE_ID 1000000000
 
+#define DEBUG_MODE true
+#define MAX_INSTANCES_IN_CELL 64
+
+typedef int DEPTH_TYPE;
 #define _EMPTY 0
 #pragma region Variable Declaration
 typedef signed char s8;
@@ -34,7 +37,8 @@ typedef signed long s64;
 typedef unsigned long u64;
 typedef float f32;
 typedef double f64;
-//typedef static global;
+
+
 
 enum INST_TYPE {
   NOTHING = 0,
@@ -52,6 +56,17 @@ enum P_TYPE{
   PT_DOUBLE = 6,
 
 };
+enum VAR_TYPE{
+  T_EMPTY = 0,
+  T_CHAR = 1,
+  T_UCHAR = 2,
+  T_INT = 3,
+  T_UINT = 4,
+  T_LONG = 5,
+  T_ULONG = 6,
+  T_FLOAT = 7,
+  T_DOUBLE = 8,
+};
 typedef struct custom_pointer {
   u8 pointer_type;
   union {
@@ -65,8 +80,28 @@ typedef struct custom_pointer {
   };
 
 } custom_pointer;
+typedef struct custom_variable{
+  u8 var_type;
+  union {
+    char t_char;
+    unsigned char t_uchar;
+    short t_short;
+    unsigned short t_ushort;
+    int t_int;
+    unsigned int t_uint;
+    long t_long;
+    unsigned long t_ulong;
+    float t_float;
+    double t_double;
+  };
+} custom_variable;
 
 #pragma endregion
+typedef struct GridVector2D {
+  unsigned int x;
+  unsigned int y;
+}GridVector2D;
+
 typedef struct Animation2D {
   u8 animation_speed;
   u8 frame_counter;
@@ -82,16 +117,19 @@ typedef struct Instance {
   u32 ID;
   u8 exist;
   Vector2 pos ;
-  //Texture2D *sprite;
+  GridVector2D cell_pos;
+  DEPTH_TYPE depth;
+  //Texture2D *static_sprite;
   float scale ;
   float angle ;
   Animation2D animation;
+  //void (*f_create)(Instance*);
   void (*f_main)(Instance*);
   void (*f_draw)(Instance*);
   void (*f_drawGUI)(Instance*);
-  //void (*f_main)(Instance*);
-  //void (*f_main_draw)(Instance*);
   u16 type;
+  u8 custom_count;
+  void (*f_custom[16])(Instance*);
 }Instance;
 
 typedef struct Instance3D {
@@ -118,9 +156,33 @@ typedef struct InstanceArray{
   size_t size;
 } InstanceArray;
 
+typedef struct UICLayer {
 
+
+}UICLayer;
+
+typedef struct CameraInstance2D { 
+  Instance target_instance;
+  Vector2 target_pos;
+  Camera2D *camera;
+}CameraInstance;
+
+typedef struct Grid2D { 
+  unsigned int width;
+  unsigned int height;
+  unsigned int **grid;
+}Grid2D;
+typedef struct Cell{
+  GridVector2D grid_pos;
+}Cell;
+typedef struct CellGrid2D { 
+  unsigned int width;
+  unsigned int height;
+  //Instance **contained_inst;
+  Cell **grid;
+}CellGrid2D;
 #ifndef KAPI
-    #define KAPI       // Functions defined as 'extern' by default (implicit specifiers)
+  #define KAPI
 #endif
 
 
@@ -159,13 +221,14 @@ int FindEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
 int FindNotEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
 //void CreateArrayInt(IntArray *a, size_t initialSize);
 //Includes
+
 #include "f_common.c"
 #include "f_array.c"
 #include "f_stack.c"
 #include "f_draw.c"
+#include "UIC.c"
 #include "f_inst_step_ivent.c"
 #include "f_inst_draw_ivent.c"
 #include "f_instance.c"
-//#include "f_UI.c"
 
 #endif

@@ -24,7 +24,6 @@ static InstanceArray inst_array;
 //int _a = sizeof(inst_array);
 
 int main(){
-  
   InitWindow(screenWidth, screenHeight, "My Game");
   SetTargetFPS(_TARGET_FPS);
   InitArrayInstance(&inst_array, 16);
@@ -33,7 +32,9 @@ int main(){
   camera.offset = (Vector2){ screenWidth/2, screenHeight/2};
   camera.target = (Vector2) {0, 0};
   camera.rotation = 0.0f;
-  
+  CameraInstance2D CurrentCamera = {
+    .camera = &camera
+  };
 
   #pragma endregion
   #pragma region Load sprites
@@ -41,12 +42,23 @@ int main(){
   Texture2D dude_animation_sprite = LoadTexture("sprites/test32.png");
   #pragma endregion
   #pragma region Create Instance
+  
   Animation2D player_animation = CreateAnimation2D(&player_animation_sprite, 6, _LOW_SPEED_ANIMATION);
   Animation2D dude_animation = CreateAnimation2D(&dude_animation_sprite, 6, _HIGHT_SPEED_ANIMATION-10);
+
+  Animation2D empty_animation;
+  AddInstanceType((Vector2){0,0}, &inst_array, &empty_animation, NOTHING);
+  
   AddInstanceType((Vector2){0,0}, &inst_array, &player_animation, PLAYER);
+  AddInstanceType((Vector2){16,16}, &inst_array,  &dude_animation, ENEMY);
+  AddInstanceType((Vector2){32,32}, &inst_array,  &dude_animation, ENEMY);
+  AddInstanceType((Vector2){64,64}, &inst_array,  &dude_animation, ENEMY);
+  AddInstanceType((Vector2){100,100}, &inst_array,  &dude_animation, ENEMY);
+  AddInstanceType((Vector2){26,27}, &inst_array,  &dude_animation, ENEMY);
   #pragma endregion
   int number = 0;
-  //rlPushMatrix();
+  CellGrid2D test_grid = CreateCellGrid2D(10, 10);
+  
   while (!WindowShouldClose()) {
     #pragma region Step Invent
     mouse_world_pos = GetScreenToWorld2D(GetMousePosition(), camera);
@@ -71,13 +83,15 @@ int main(){
     UpdateInstances(&inst_array);
     BeginDrawing();
       ClearBackground(RAYWHITE);
-      BeginMode2D(camera);
+      BeginMode2D(*CurrentCamera.camera);
         UpdateDrawInstances(&inst_array);
       EndMode2D();
       UpdateDrawGUIInstances(&inst_array);
       DrawText(TextFormat("%i",number), 4,4,24,BLACK);
     EndDrawing();
-    camera.target = inst_array.array[0].pos;
+    #pragma endregion
+    #pragma region Camera Update Ivent
+      CurrentCamera.camera->target = inst_array.array[1].pos;
     #pragma endregion
   }
   CloseWindow();
