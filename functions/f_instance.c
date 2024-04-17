@@ -16,6 +16,7 @@ Instance CreateInstanceType(Vector2 _position, Animation2D *_animation, u16 _typ
     }break;
     case PLAYER:{
       _new_instance.depth = 45;
+      _new_instance.f_test_main = &OtherPlayerMain;
     }break;
     case ENEMY:{
       _new_instance.depth = GetRandomValue(1, 100) ;
@@ -194,7 +195,11 @@ void UpdateDrawGUIInstances(InstanceArray *_inst_a){
 void UpdateDrawCells(CellGrid2D *cell_grid){
   for(u32 h = 0;h<cell_grid->height;h++){
     for(u32 w = 0;w<cell_grid->width;w++){
-      DrawTexture(*cell_grid->grid[h][w].static_sprite, PIXEL_SIZE * w,PIXEL_SIZE * h, WHITE);
+      Cell *_cur_cell = &cell_grid->grid[h][w];
+      if(!_cur_cell->exist){
+      continue;
+      }
+      DrawTexture(*_cur_cell->static_sprite, PIXEL_SIZE * w,PIXEL_SIZE * h, WHITE);
     }
   }
 }

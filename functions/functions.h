@@ -38,8 +38,18 @@ typedef signed long s64;
 typedef unsigned long u64;
 typedef float f32;
 typedef double f64;
+struct custom_pointer;
 
-
+enum global {
+  G_SCREEN_W,
+  G_SCREEN_H,
+  G_WORLDGRID_H,
+  G_WORLDGRID_W,
+  G_INSTARRAY,
+  G_WORLDCAM,
+  G_CURCELL,
+  G_MOUSE_WORLD_POS,
+};
 
 enum INST_TYPE {
   NOTHING = 0,
@@ -47,16 +57,7 @@ enum INST_TYPE {
   ENEMY = 2
 
 };
-enum P_TYPE{
-  PT_VOID = 0,
-  PT_CHAR = 1,
-  PT_UCHAR = 2,
-  PT_INT = 3,
-  PT_UINT = 4,
-  PT_FLOAT = 5,
-  PT_DOUBLE = 6,
 
-};
 enum VAR_TYPE{
   T_EMPTY = 0,
   T_CHAR = 1,
@@ -67,20 +68,9 @@ enum VAR_TYPE{
   T_ULONG = 6,
   T_FLOAT = 7,
   T_DOUBLE = 8,
+ 
 };
-typedef struct custom_pointer {
-  u8 pointer_type;
-  union {
-    void *p_void;
-    char *p_char;
-    unsigned char *p_uchar;
-    int *p_int;
-    unsigned int *p_uint;
-    float *p_float;
-    double *p_double;
-  };
 
-} custom_pointer;
 typedef struct custom_variable{
   u8 var_type;
   union {
@@ -126,6 +116,7 @@ typedef struct Instance {
   Animation2D animation;
   //void (*f_create)(Instance*);
   void (*f_main)(Instance*);
+  void (*f_test_main)(Instance*, custom_pointer*);
   void (*f_draw)(Instance*);
   void (*f_drawGUI)(Instance*);
   u16 type;
@@ -176,6 +167,7 @@ typedef struct Grid2D {
 typedef struct Cell{
   GridVector2D grid_pos;
   Texture2D *static_sprite;
+  u8 exist;
 }Cell;
 typedef struct CellGrid2D { 
   unsigned int width;
@@ -185,7 +177,20 @@ typedef struct CellGrid2D {
 #ifndef KAPI
   #define KAPI
 #endif
+enum P_TYPE{
+  PT_VOID = 0,
+  PT_CHAR = 1,
+  PT_UCHAR = 2,
+  PT_INT = 3,
+  PT_UINT = 4,
+  PT_FLOAT = 5,
+  PT_DOUBLE = 6,
+  PT_CAMERA = 9,
+  PT_INST_ARRAY = 10,
+  PT_CELL = 11,
+  PT_VECTOR2 = 12
 
+};
 
 
 //Instances
@@ -222,6 +227,26 @@ int FindEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
 int FindNotEmptyInstance(Instance *array, s32 _offset, s32 _max_lng);
 //void CreateArrayInt(IntArray *a, size_t initialSize);
 //Includes
+typedef struct custom_pointer {
+  u8 pointer_type;
+  union {
+    void *p_void;
+    char *p_char;
+    unsigned char *p_uchar;
+    int *p_int;
+    unsigned int *p_uint;
+    float *p_float;
+    double *p_double;
+    CameraInstance2D *p_camera;
+    InstanceArray *p_inst_array;
+    Cell *p_cell;
+    Vector2 *p_vector2D;
+  };
+
+} custom_pointer;
+
+
+
 
 #include "f_common.c"
 #include "f_array.c"

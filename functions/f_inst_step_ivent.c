@@ -17,11 +17,17 @@ void PlayerMain(Instance *self){
     }
     if (IsKeyDown(KEY_A)) self->angle--;
     else if (IsKeyDown(KEY_S)) self->angle++;
+    //self->pos = (Vector2){(float)(cell_on_hover->grid_pos.x * PIXEL_SIZE), (float)(cell_on_hover->grid_pos.y* PIXEL_SIZE)};
 }
+void OtherPlayerMain(Instance *self, custom_pointer *global_array){
+  //self->depth = GetRandomValue(1, 100);
+  self->pos = {(float)(global_array[G_CURCELL].p_cell->grid_pos.x * PIXEL_SIZE), (float)(global_array[G_CURCELL].p_cell->grid_pos.y* PIXEL_SIZE)};
+  //self->pos = {(float)GetRandomValue(0, 100), (float)GetRandomValue(0, 100)};
+};
 void EnemyMainIvent(Instance *self){
 
 
-}
+};
 void DumpFunction(Instance *self){return;};
 
 void AssignFunction(void(**function)(Instance*), u16 _type){
