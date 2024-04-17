@@ -191,4 +191,11 @@ void UpdateDrawGUIInstances(InstanceArray *_inst_a){
     _cur_inst->f_drawGUI(_cur_inst);
   };
 };
+void UpdateDrawCells(CellGrid2D *cell_grid){
+  for(u32 h = 0;h<cell_grid->height;h++){
+    for(u32 w = 0;w<cell_grid->width;w++){
+      DrawTexture(*cell_grid->grid[h][w].static_sprite, PIXEL_SIZE * w,PIXEL_SIZE * h, WHITE);
+    }
+  }
+}
 

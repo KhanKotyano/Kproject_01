@@ -94,8 +94,8 @@ Grid2D CreateGrid2D(unsigned int _width, unsigned int _height){
   //printf("Created Grid\n");
   unsigned int **temp_gridgrid = (unsigned int **)malloc(sizeof(unsigned int **) * _height);
   //printf("Allocated TempGrid\n");
-  for(unsigned int i = 0; i < _width;i++){
-    unsigned int *a = (unsigned int*)malloc(sizeof(unsigned int) * _height);
+  for(unsigned int i = 0; i < _height;i++){
+    unsigned int *a = (unsigned int*)malloc(sizeof(unsigned int) * _width);
     temp_gridgrid[i] = a;
   }
   //printf("Assign TempGrid \n");
@@ -104,8 +104,8 @@ Grid2D CreateGrid2D(unsigned int _width, unsigned int _height){
   //_temp_grid2d.grid[1][1] = 15;
   //printf("expected val:%d | test val:%d\n", 15,temp_gridgrid[1][1]);
   unsigned int j = 0;
-  for(unsigned int i = 0; i < _width;i++){
-    for(unsigned int ii = 0; ii < _height;ii++){
+  for(unsigned int i = 0; i < _height;i++){
+    for(unsigned int ii = 0; ii < _width;ii++){
       j++;
       _temp_grid2d.grid[i][ii] = j;
       #if DEBUG_MODE
@@ -124,21 +124,21 @@ CellGrid2D CreateCellGrid2D(unsigned int _width, unsigned int _height){
     .height = _height,
   };
   Cell **temp_gridgrid = (Cell **)malloc(sizeof(Cell **) * _height);
-  for(unsigned int i = 0; i < _width;i++){
-    Cell *a = (Cell*)malloc(sizeof(Cell) * _height);
-    temp_gridgrid[i] = a;
+  for(unsigned int h = 0; h < _height;h++){
+    Cell *a = (Cell*)malloc(sizeof(Cell) * _width);
+    temp_gridgrid[h] = a;
   }
   _temp_grid2d.grid = temp_gridgrid;
   
   //_temp_grid2d.grid[1][1].grid_pos = (GridVector2D){15,15};
   //printf("expected val:%d | test val:%d\n", 15,temp_gridgrid[1][1].grid_pos.x);
   unsigned int j = 0;
-  for(unsigned int i = 0; i < _width;i++){
-    for(unsigned int ii = 0; ii < _height;ii++){
+  for(unsigned int h = 0; h < _height;h++){
+    for(unsigned int w = 0; w < _width;w++){
       j++;
-      _temp_grid2d.grid[i][ii].grid_pos = (GridVector2D){i, ii};
+      _temp_grid2d.grid[h][w].grid_pos = (GridVector2D){w, h};
       #if DEBUG_MODE
-        printf("x:%d y:%d pos:%d,%d \n", i , ii, _temp_grid2d.grid[i][ii].grid_pos.x,_temp_grid2d.grid[i][ii].grid_pos.y);
+        printf("x:%d y:%d pos:%d,%d \n", w , h, _temp_grid2d.grid[h][w].grid_pos.x,_temp_grid2d.grid[h][w].grid_pos.y);
       #endif
     }
   }  

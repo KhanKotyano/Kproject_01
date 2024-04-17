@@ -20,6 +20,7 @@
 #define _HIGHT_SPEED_ANIMATION (15*_ANIMATION_FPS_OFFSET)
 #define _VERYHIGHT_SPEED_ANIMATION (20*_ANIMATION_FPS_OFFSET)
 #define _INSTANCE_ID 1000000000
+#define PIXEL_SIZE 32
 
 #define DEBUG_MODE true
 #define MAX_INSTANCES_IN_CELL 64
@@ -162,7 +163,7 @@ typedef struct UICLayer {
 }UICLayer;
 
 typedef struct CameraInstance2D { 
-  Instance target_instance;
+  Instance *target_instance;
   Vector2 target_pos;
   Camera2D *camera;
 }CameraInstance;
@@ -174,11 +175,11 @@ typedef struct Grid2D {
 }Grid2D;
 typedef struct Cell{
   GridVector2D grid_pos;
+  Texture2D *static_sprite;
 }Cell;
 typedef struct CellGrid2D { 
   unsigned int width;
   unsigned int height;
-  //Instance **contained_inst;
   Cell **grid;
 }CellGrid2D;
 #ifndef KAPI

@@ -1,18 +1,18 @@
 #include "functions.h"
 void PlayerMain(Instance *self){
     //self->depth = GetRandomValue(1, 100);
-    if(IsKeyDown(KEY_UP)){
+    if(IsKeyDown(KEY_W)){
     self->pos.y -= 1;
     //self->scale -= 0.005f;
     }
-    if(IsKeyDown(KEY_DOWN)){
+    if(IsKeyDown(KEY_S)){
       self->pos.y += 1;
       //self->scale += 0.005f;
     }
-    if(IsKeyDown(KEY_LEFT)){
+    if(IsKeyDown(KEY_A)){
       self->pos.x -= 1;
     }
-    if(IsKeyDown(KEY_RIGHT)){
+    if(IsKeyDown(KEY_D)){
       self->pos.x  += 1;
     }
     if (IsKeyDown(KEY_A)) self->angle--;
