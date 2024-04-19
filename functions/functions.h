@@ -27,6 +27,14 @@
 #define DEBUG_MODE_SHOW_SIZE true
 #define MAX_INSTANCES_IN_CELL 64
 
+/*#ifndef _CUSTOM_DEF
+  #define _CUSTOM_DEF
+  #define GLOBAL_LOCKON_CELL global_pointer_array[G_LOCK_ON_CELL].p_cell
+  #define GLOBAL_SCREEN_W global_pointer_array[G_SCREEN_W].p_int
+  #define GLOBAL_SCREEN_H global_pointer_array[G_SCREEN_H].p_int
+
+  #define MAIN_GRID_CUR_POS main_grid.grid[cell_on_hover.grid_pos.y][cell_on_hover.grid_pos.x]
+#endif*/
 
 typedef int DEPTH_TYPE;
 #define _EMPTY 0
@@ -42,6 +50,8 @@ typedef unsigned long u64;
 typedef float f32;
 typedef double f64;
 struct custom_pointer;
+struct Instance;
+struct Cell;
 
 enum global {
   G_SCREEN_W,
@@ -52,7 +62,9 @@ enum global {
   G_WORLDCAM,
   G_CURCELL,
   G_MOUSE_WORLD_POS,
-  G_LOCK_ON_CELL
+  G_LOCK_ON_CELL,
+  G_EMPTY_CELL, 
+  G_MAIN_GRID
 };
 
 enum INST_TYPE {
@@ -106,7 +118,9 @@ typedef struct Animation2D {
   Texture2D *sprite_sheet;
 } Animation2D;
 
-
+typedef struct CustomInstVar {
+  Cell *my_cell;
+}CustomInstVar;
 
 typedef struct Instance {
   u32 ID;
@@ -118,9 +132,9 @@ typedef struct Instance {
   float scale ;
   float angle ;
   Animation2D animation;
-  //void (*f_create)(Instance*);
+  CustomInstVar custom_var;
+  void (*f_create)(Instance*, custom_pointer*);
   void (*f_main)(Instance*, custom_pointer*);
-  //void (*f_test_main)(Instance*, custom_pointer*);
   void (*f_draw)(Instance*, custom_pointer*);
   void (*f_drawGUI)(Instance*, custom_pointer*);
   u16 type;
@@ -172,6 +186,7 @@ typedef struct Cell{
   GridVector2D grid_pos;
   Texture2D *static_sprite;
   u8 exist;
+  Instance *contaned_inst;
 }Cell;
 typedef struct CellGrid2D { 
   unsigned int width;
@@ -192,7 +207,8 @@ enum P_TYPE{
   PT_CAMERA = 9,
   PT_INST_ARRAY = 10,
   PT_CELL = 11,
-  PT_VECTOR2 = 12
+  PT_VECTOR2 = 12, 
+  PT_CELL_GRID2D = 13,
 
 };
 
@@ -202,7 +218,7 @@ void DumpFunction(Instance *self);
 void DrawSelf(Instance *self);
 void AnimateSelf(Instance *self);
 //void PlayerIvent(Instance *self);
-void AddInstance( Vector2 _position, InstanceArray *_inst_array, Texture2D *_sprite, Animation2D *_animation);
+//void AddInstance( Vector2 _position, InstanceArray *_inst_array, Texture2D *_sprite, Animation2D *_animation);
 void UpdateInstances(InstanceArray *_inst_array, custom_pointer *global_pointer_array);
 void UpdateDrawInstances(InstanceArray *_inst_array, custom_pointer *global_pointer_array);
 //void AssignTypeFunctions(void(**_function_array)(Instance*), u16 _type);
@@ -245,6 +261,7 @@ typedef struct custom_pointer {
     InstanceArray *p_inst_array;
     Cell *p_cell;
     Vector2 *p_vector2D;
+    CellGrid2D *p_grid_cell2D;
   };
 
 } custom_pointer;

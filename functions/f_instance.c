@@ -22,6 +22,7 @@ Instance CreateInstanceType(Vector2 _position, Animation2D *_animation, u16 _typ
       _new_instance.depth = GetRandomValue(1, 100) ;
     }break;
   }
+  AssignCreateFunction(&_new_instance.f_create, _type);
   AssignFunction(&_new_instance.f_main, _type);
   AssignDrawFunction(&_new_instance.f_draw, _type);
   AssignDrawGUIFunction(&_new_instance.f_drawGUI, _type);
@@ -69,6 +70,7 @@ Instance InheritInstance(Instance *_inst, Vector2 _new_pos){
   _new_instance.angle = _inst->angle;
   return _new_instance;
 }
+
 void AddInstance( Vector2 _position, InstanceArray *a, Animation2D *_animation){
   Instance _inst = CreateInstance(_position, _animation);
   if (a->used == a->size) {
@@ -95,7 +97,8 @@ void AddInstance( Vector2 _position, InstanceArray *a, Animation2D *_animation){
   //a->array[a->used-1].ID = a->used;
   _inst = {NULL};
 }
-void AddInstanceType( Vector2 _position, InstanceArray *a, Animation2D *_animation, u16 _type){
+
+void AddInstanceType( custom_pointer *global_pointer_array,Vector2 _position, InstanceArray *a, Animation2D *_animation, u16 _type){
   Instance _inst = CreateInstanceType(_position, _animation, _type);
   //ArrayPushInstance(_inst_array, _inst);
   if (a->used == a->size) {
@@ -118,8 +121,11 @@ void AddInstanceType( Vector2 _position, InstanceArray *a, Animation2D *_animati
       }
     }
   } 
+
   a->array[a->used++] = _inst;
-  //a->array[a->used-1].ID = a->used;
+  printf("before create ivent\n");
+  a->array[a->used].custom_var.my_cell = global_pointer_array[G_LOCK_ON_CELL].p_cell;
+  //a->array[a->used].f_create(&a->array[a->used], global_ptr);
   _inst = {NULL};
 }
 

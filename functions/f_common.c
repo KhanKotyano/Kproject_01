@@ -42,17 +42,77 @@ custom_pointer SetCustomPointer(void *pointer, unsigned char _pointer_type){
     _custom_ptr.p_cell = (Cell*)pointer;
     //_custom_ptr.pointer_type = _pointer_type;
   }break;
+  case PT_CELL_GRID2D:{
+    _custom_ptr.p_grid_cell2D = (CellGrid2D*)pointer;
+    //_custom_ptr.pointer_type = _pointer_type;
+  }break;
   case PT_VECTOR2:{
     _custom_ptr.p_vector2D = (Vector2*)pointer;
     //_custom_ptr.pointer_type = _pointer_type;
   }break;
   default:{
-  
+    printf("ERROR!: Custrom pointer type does not exist \n");
   }break;
   }
   _custom_ptr.pointer_type = _pointer_type;
   return _custom_ptr;
 }
+void *GetCustomPointer(custom_pointer *_custom_ptr){
+  switch (_custom_ptr->pointer_type){
+  case PT_VOID:{
+    return _custom_ptr->p_void;
+   // _custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_INT:{
+    return _custom_ptr->p_int;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_UINT:{
+    return _custom_ptr->p_uint ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_UCHAR:{
+    return _custom_ptr->p_uchar ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_CHAR:{
+    return _custom_ptr->p_char ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_FLOAT:{
+    return _custom_ptr->p_float ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_DOUBLE:{
+    return _custom_ptr->p_double ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_CAMERA:{
+    return _custom_ptr->p_camera ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_INST_ARRAY:{
+    return _custom_ptr->p_inst_array ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_CELL:{
+    return _custom_ptr->p_cell ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_CELL_GRID2D:{
+    return _custom_ptr->p_grid_cell2D ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  case PT_VECTOR2:{
+    return _custom_ptr->p_vector2D ;
+    //_custom_ptr->pointer_type = _pointer_type;
+  }break;
+  default:{
+    return nullptr;
+    printf("ERROR!: Custrom pointer type does not exist \n");
+  }break;
+  }
+};
 //Memory Unsafe???
 char* FloatToString( float recast ){
   int length = snprintf( NULL, 0, "%g", recast ); 
@@ -199,18 +259,21 @@ CellGrid2D CreateCellGrid2D(unsigned int _width, unsigned int _height){
   printf("Grid Created Successfully\n");
   return _temp_grid2d;
 }
-Cell GetGridOnHover(Vector2 _mouse_world_pos, GridVector2D *_grid_on_hover_pos, CellGrid2D *cell_grid, GridVector2D WorldGrid ){
-  _grid_on_hover_pos->x = 0;
-  _grid_on_hover_pos->y = 0;
-  if(_mouse_world_pos.x > 0) {
-    _grid_on_hover_pos->x = (unsigned int)_mouse_world_pos.x / PIXEL_SIZE;
-  } 
-  if(_mouse_world_pos.y > 0) {
-    _grid_on_hover_pos->y = (unsigned int)_mouse_world_pos.y / PIXEL_SIZE;
-  }
+Cell GetGridOnHover(Vector2 _mouse_world_pos, GridVector2D *_grid_on_hover_pos, CellGrid2D *cell_grid, GridVector2D WorldGrid
+                    , Cell *cell_on_hover){
+  //_grid_on_hover_pos->x = 0;
+  //_grid_on_hover_pos->y = 0;
+  /*if(_mouse_world_pos.x >= 0) {_grid_on_hover_pos->x = (unsigned int)_mouse_world_pos.x / PIXEL_SIZE;
+  } else { _grid_on_hover_pos->x = 0;}
+  if(_mouse_world_pos.y >= 0) {_grid_on_hover_pos->y = (unsigned int)_mouse_world_pos.y / PIXEL_SIZE;
+  } else {_grid_on_hover_pos->y = 0;}*/
+  _grid_on_hover_pos->x = (((unsigned int)_mouse_world_pos.x) / PIXEL_SIZE) * (_mouse_world_pos.x >= 0);
+  _grid_on_hover_pos->y = (((unsigned int)_mouse_world_pos.y) / PIXEL_SIZE) * (_mouse_world_pos.y >= 0);
   if(_grid_on_hover_pos->x >= WorldGrid.x) _grid_on_hover_pos->x = WorldGrid.x-1;
   if(_grid_on_hover_pos->y >= WorldGrid.y) _grid_on_hover_pos->y = WorldGrid.y-1;
-  if(_mouse_world_pos.x < 0) _grid_on_hover_pos->x = 0;
-  if(_mouse_world_pos.y < 0) _grid_on_hover_pos->y = 0;
-  return cell_grid->grid[_grid_on_hover_pos->y][_grid_on_hover_pos->x];
+
+  if(cell_grid->grid[_grid_on_hover_pos->y][_grid_on_hover_pos->x].exist){
+    return cell_grid->grid[_grid_on_hover_pos->y][_grid_on_hover_pos->x];
+  }
+  return *cell_on_hover;
 }
