@@ -23,7 +23,10 @@
 #define PIXEL_SIZE 32
 
 #define DEBUG_MODE true
+#define DEBUG_MODE_SHOW_GRID false
+#define DEBUG_MODE_SHOW_SIZE true
 #define MAX_INSTANCES_IN_CELL 64
+
 
 typedef int DEPTH_TYPE;
 #define _EMPTY 0
@@ -49,6 +52,7 @@ enum global {
   G_WORLDCAM,
   G_CURCELL,
   G_MOUSE_WORLD_POS,
+  G_LOCK_ON_CELL
 };
 
 enum INST_TYPE {
@@ -115,10 +119,10 @@ typedef struct Instance {
   float angle ;
   Animation2D animation;
   //void (*f_create)(Instance*);
-  void (*f_main)(Instance*);
-  void (*f_test_main)(Instance*, custom_pointer*);
-  void (*f_draw)(Instance*);
-  void (*f_drawGUI)(Instance*);
+  void (*f_main)(Instance*, custom_pointer*);
+  //void (*f_test_main)(Instance*, custom_pointer*);
+  void (*f_draw)(Instance*, custom_pointer*);
+  void (*f_drawGUI)(Instance*, custom_pointer*);
   u16 type;
   u8 custom_count;
   void (*f_custom[16])(Instance*);
@@ -199,8 +203,8 @@ void DrawSelf(Instance *self);
 void AnimateSelf(Instance *self);
 //void PlayerIvent(Instance *self);
 void AddInstance( Vector2 _position, InstanceArray *_inst_array, Texture2D *_sprite, Animation2D *_animation);
-void UpdateInstances(InstanceArray *_inst_array);
-void UpdateDrawInstances(InstanceArray *_inst_array);
+void UpdateInstances(InstanceArray *_inst_array, custom_pointer *global_pointer_array);
+void UpdateDrawInstances(InstanceArray *_inst_array, custom_pointer *global_pointer_array);
 //void AssignTypeFunctions(void(**_function_array)(Instance*), u16 _type);
 //Common
 char* FloatToString( float recast );

@@ -16,7 +16,7 @@ Instance CreateInstanceType(Vector2 _position, Animation2D *_animation, u16 _typ
     }break;
     case PLAYER:{
       _new_instance.depth = 45;
-      _new_instance.f_test_main = &OtherPlayerMain;
+      //_new_instance.f_test_main = &OtherPlayerMain;
     }break;
     case ENEMY:{
       _new_instance.depth = GetRandomValue(1, 100) ;
@@ -132,14 +132,14 @@ void InstanceDestroy(Instance* _inst){
 }
 
 
-void UpdateInstances(InstanceArray *_inst_a){
+void UpdateInstances(InstanceArray *_inst_a, custom_pointer *global_prt){
   size_t _used_size = (size_t)_inst_a->used;
   for(unsigned int i = 0;i<_used_size;i++){
     Instance *_cur_inst = &_inst_a->array[i];
     if(!_cur_inst->exist){
       continue;
     }
-    _cur_inst->f_main(_cur_inst);
+    _cur_inst->f_main(_cur_inst, global_prt);
   };
 
 };
@@ -167,7 +167,7 @@ int GetDrawingOrder(Instance *_inst_a, int *order_array, size_t _used_size){
   return 0;
 };
 
-void UpdateDrawInstances(InstanceArray *_inst_a){
+void UpdateDrawInstances(InstanceArray *_inst_a, custom_pointer *global_prt){
   size_t _used_size = (size_t)_inst_a->used;
   int _order_array[_used_size];
   GetDrawingOrder(_inst_a->array, _order_array, _used_size);
@@ -178,18 +178,18 @@ void UpdateDrawInstances(InstanceArray *_inst_a){
     if(!_cur_inst->exist){
       continue;
     }
-    _cur_inst->f_draw(_cur_inst);
+    _cur_inst->f_draw(_cur_inst, global_prt);
   }
   //exit(0);
 };
-void UpdateDrawGUIInstances(InstanceArray *_inst_a){
+void UpdateDrawGUIInstances(InstanceArray *_inst_a, custom_pointer *global_prt){
   size_t _used_size = (size_t)_inst_a->used;
   for(unsigned int i = 0;i<_used_size;i++){
     Instance *_cur_inst = &_inst_a->array[i];
     if(!_cur_inst->exist){
       continue;
     }
-    _cur_inst->f_drawGUI(_cur_inst);
+    _cur_inst->f_drawGUI(_cur_inst, global_prt);
   };
 };
 void UpdateDrawCells(CellGrid2D *cell_grid){
