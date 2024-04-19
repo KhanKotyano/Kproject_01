@@ -73,7 +73,6 @@ void freeArrayInt(IntArray *a) {
 #pragma endregion
 
 #pragma region Inst Array
-
 void EmptyInstanceArray(InstanceArray *a, int _offset){
   for(int i = _offset;i< (int)a->size;i++){
     a->array[i] = {_EMPTY};
@@ -148,7 +147,70 @@ void freeArrayInstance(InstanceArray *a) {
   a->array = NULL;
   a->used = a->size = 0;
 };
+
+
+void EmptyPtrArray(PointerArray *a, int _offset){
+  for(int i = _offset;i< (int)a->size;i++){
+    a->array[i] = {_EMPTY};
+  }
+};
+void InitArrayPtr(PointerArray *a, size_t initialSize) {
+  a->array = (custom_pointer*)malloc(initialSize * sizeof(custom_pointer));
+  a->used = 0;
+  a->size = initialSize;
+  EmptyPtrArray(a, 0);
+}
+
+void ArrayPushPtr(PointerArray *a, custom_pointer element) {
+  if (a->used == a->size) {
+    a->size *= 2;
+    a->array = (custom_pointer*)realloc(a->array, a->size * sizeof(custom_pointer));
+    EmptyPtrArray(a, a->used);
+  }
+  a->array[a->used++] = element;
+}
+void ArrayEmptyIndexPtr(PointerArray *a, int _index){
+  a->array[_index] = {0};
+}
+void ArraySetIndexPtr(PointerArray *a, int _index, custom_pointer _value){
+  a->array[_index] = _value;
+}
+
+int FindNotEmptyPtr(custom_pointer *array, s32 _offset, s32 _max_lng){
+  for(s32 i = _offset;i < _max_lng;i++){
+    if(array[i].pointer_type != _EMPTY){
+      return i;
+    }
+  }
+  return -1;
+}
+bool RedoPtrArray(PointerArray *a){
+  int _counter = 0;
+  for(s32 i = 0;i < (s32)a->used;i++){
+    if(a->array[i].pointer_type == _EMPTY){
+      _counter = i;
+      int _empty_index = FindNotEmptyPtr(a->array, i, a->used);
+      if(_empty_index != -1){
+        a->array[i] = a->array[_empty_index];
+        a->array[_empty_index].pointer_type = _EMPTY;
+      } else {
+        a->used = (size_t)_counter;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+void freeArrayPtr(PointerArray *a) {
+  free(a->array);
+  a->array = NULL;
+  a->used = a->size = 0;
+};
+
 #pragma endregion
+
+
 /*
 typedef struct Array{
   void *array;

@@ -124,8 +124,9 @@ void AddInstanceType( custom_pointer *global_pointer_array,Vector2 _position, In
 
   a->array[a->used++] = _inst;
   printf("before create ivent\n");
-  a->array[a->used].custom_var.my_cell = global_pointer_array[G_LOCK_ON_CELL].p_cell;
-  //a->array[a->used].f_create(&a->array[a->used], global_ptr);
+  //a->array[a->used].custom_var.my_cell = global_pointer_array[G_LOCK_ON_CELL].p_cell;
+  //global_pointer_array[G_MAIN_GRID].p_grid_cell2D->grid[5][5].exist = 0;
+  //a->array[a->used].f_create(&a->array[a->used], global_pointer_array);
   _inst = {NULL};
 }
 
@@ -138,14 +139,14 @@ void InstanceDestroy(Instance* _inst){
 }
 
 
-void UpdateInstances(InstanceArray *_inst_a, custom_pointer *global_prt){
+void UpdateInstances(InstanceArray *_inst_a, custom_pointer *global_ptr){
   size_t _used_size = (size_t)_inst_a->used;
   for(unsigned int i = 0;i<_used_size;i++){
     Instance *_cur_inst = &_inst_a->array[i];
     if(!_cur_inst->exist){
       continue;
     }
-    _cur_inst->f_main(_cur_inst, global_prt);
+    _cur_inst->f_main(_cur_inst, global_ptr);
   };
 
 };

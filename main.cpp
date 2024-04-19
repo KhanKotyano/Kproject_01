@@ -21,19 +21,22 @@ unsigned int WorldGridWidth = 20;
 Camera2D camera = { 0 };
 //Camera3D camera_3d = { 0 };
 InstanceArray inst_array;
+IntArray creation_inst_array = { 0 };
 //Instance **creation_inst_array;
 Cell cell_on_hover = { 0 };
 Cell lock_on_cell  = { 0 };
 Cell empty_lockon_cell = { 0 };
 Vector2 mouse_world_pos;
-
+PointerArray g_pt_array;
 custom_pointer global_pointer_array[1280];
+
 #ifndef _CUSTOM_DEF
   #define _CUSTOM_DEF
   #define GLOBAL_LOCKON_CELL global_pointer_array[G_LOCK_ON_CELL].p_cell
   #define GLOBAL_SCREEN_W global_pointer_array[G_SCREEN_W].p_int
   #define GLOBAL_SCREEN_H global_pointer_array[G_SCREEN_H].p_int
 
+  #define GLOBAL_PTR_ARRAY g_pt_array.array
   #define MAIN_GRID_CUR_POS main_grid.grid[cell_on_hover.grid_pos.y][cell_on_hover.grid_pos.x]
 #endif
 
@@ -44,6 +47,8 @@ int main(){
   InitWindow(screenWidth, screenHeight, "My Game");
   SetTargetFPS(_TARGET_FPS);
   InitArrayInstance(&inst_array, 16);
+  //InitArray(&inst_array, 16);
+  //InitArrayPtr()
 
   #if DEBUG_MODE
     //printf("%d \n", (int)sizeof(global_pointer_array));
@@ -76,23 +81,16 @@ int main(){
   Animation2D dude_animation = CreateAnimation2D(&dude_animation_sprite, 6, _HIGHT_SPEED_ANIMATION-10);
 
   Animation2D empty_animation;
-  
-
-  AddInstanceType(global_pointer_array,(Vector2){0,0}, &inst_array, &player_animation, PLAYER);
-  //AddInstanceType((Vector2){0,0}, &inst_array, &empty_animation, NOTHING);
-  //AddInstanceType((Vector2){16,16}, &inst_array,  &dude_animation, ENEMY);
-  //AddInstanceType((Vector2){32,32}, &inst_array,  &dude_animation, ENEMY);
-  //AddInstanceType((Vector2){64,64}, &inst_array,  &dude_animation, ENEMY);
-  //AddInstanceType((Vector2){100,100}, &inst_array,  &dude_animation, ENEMY);
-  //AddInstanceType((Vector2){26,27}, &inst_array,  &dude_animation, ENEMY);
-  #pragma endregion
-  int number = 0;
-  
   for(u32 i = 0;i<main_grid.height;i++){
     for(u32 ii = 0;ii<main_grid.width;ii++){
       main_grid.grid[i][ii].static_sprite = &grass_tile;
     }
   }
+
+  
+  #pragma endregion
+  int number = 0;
+  
   printf("assign complete \n");
   global_pointer_array[G_SCREEN_W] = SetCustomPointer((int*)&screenWidth, PT_INT);
   global_pointer_array[G_SCREEN_H] = SetCustomPointer((int*)&screenHeight, PT_INT);
@@ -109,14 +107,14 @@ int main(){
   global_pointer_array[G_WORLDCAM] = SetCustomPointer((CameraInstance2D*)&CurrentCamera, PT_CAMERA);
 
   GLOBAL_LOCKON_CELL = global_pointer_array[G_EMPTY_CELL].p_cell;
+  AddInstanceType(global_pointer_array,(Vector2){0,0}, &inst_array, &player_animation, PLAYER);
   while (!WindowShouldClose()) {
     #pragma region Step Invent
-    global_pointer_array[G_MAIN_GRID].p_grid_cell2D->grid[5][5].exist = 0;
+    //inst_array.array[0].f_create(&inst_array.array[0], global_pointer_array);
     mouse_world_pos = GetScreenToWorld2D(GetMousePosition(), camera);
     number = 0;
     if(IsKeyPressed(KEY_T)){
-      int rd = GetRandomValue(0, inst_array.used-1);
-      inst_array.array[rd] = {0};
+      AddInstanceType(global_pointer_array,(Vector2){0,0}, &inst_array, &player_animation, PLAYER);
     }
     #pragma region camera ivent
     //camera.target = player.pos;
@@ -134,12 +132,18 @@ int main(){
       if(GLOBAL_LOCKON_CELL == &empty_lockon_cell){
         GLOBAL_LOCKON_CELL = &(MAIN_GRID_CUR_POS); 
       } else {
-        printf("%p : %p \n", GLOBAL_LOCKON_CELL, &(MAIN_GRID_CUR_POS));
+        #if DEBUG_MODE
+          printf("%p : %p \n", GLOBAL_LOCKON_CELL, &(MAIN_GRID_CUR_POS));
+        #endif
         if(GLOBAL_LOCKON_CELL == &(MAIN_GRID_CUR_POS)){
-          printf("lock on empty cell");
+          #if DEBUG_MODE
+            printf("lock on empty cell");
+          #endif
           GLOBAL_LOCKON_CELL = &empty_lockon_cell;
         } else {
-          printf("%p \n", &(MAIN_GRID_CUR_POS));
+          #if DEBUG_MODE
+            printf("%p \n", &(MAIN_GRID_CUR_POS));
+          #endif
           GLOBAL_LOCKON_CELL = &(MAIN_GRID_CUR_POS);
         }
       }

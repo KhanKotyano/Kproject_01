@@ -265,7 +265,11 @@ typedef struct custom_pointer {
   };
 
 } custom_pointer;
-
+typedef struct PointerArray {
+  size_t used;
+  size_t size;
+  custom_pointer *array;
+}PointerArray;
 
 
 
