@@ -28,18 +28,20 @@ Cell lock_on_cell  = { 0 };
 Cell empty_lockon_cell = { 0 };
 Vector2 mouse_world_pos;
 PointerArray g_pt_array;
-custom_pointer global_pointer_array[1280];
+//custom_pointer global_pointer_array[1280];
 
 #ifndef _CUSTOM_DEF
   #define _CUSTOM_DEF
-  #define GLOBAL_LOCKON_CELL global_pointer_array[G_LOCK_ON_CELL].p_cell
-  #define GLOBAL_SCREEN_W global_pointer_array[G_SCREEN_W].p_int
-  #define GLOBAL_SCREEN_H global_pointer_array[G_SCREEN_H].p_int
-
   #define GLOBAL_PTR_ARRAY g_pt_array.array
+
+  #define GLOBAL_LOCKON_CELL GLOBAL_PTR_ARRAY[G_LOCK_ON_CELL].p_cell
+  #define GLOBAL_SCREEN_W GLOBAL_PTR_ARRAY[G_SCREEN_W].p_int
+  #define GLOBAL_SCREEN_H GLOBAL_PTR_ARRAY[G_SCREEN_H].p_int
+  #define GLOBAL_CAMERA GLOBAL_PTR_ARRAY[G_WORLDCAM].p_camera
+  
+  #define GLOBAL_CURRENT_CAMERA GLOBAL_PTR_ARRAY[G_WORLDCAM].p_camera->camera
   #define MAIN_GRID_CUR_POS main_grid.grid[cell_on_hover.grid_pos.y][cell_on_hover.grid_pos.x]
 #endif
-
 
 
 
@@ -47,6 +49,7 @@ int main(){
   InitWindow(screenWidth, screenHeight, "My Game");
   SetTargetFPS(_TARGET_FPS);
   InitArrayInstance(&inst_array, 16);
+  InitArrayPtr(&g_pt_array, 1280);
   //InitArray(&inst_array, 16);
   //InitArrayPtr()
 
@@ -86,35 +89,43 @@ int main(){
       main_grid.grid[i][ii].static_sprite = &grass_tile;
     }
   }
-
+   main_grid.grid[4][4].exist = FALSE;
+   main_grid.grid[4][5].exist = FALSE;
+   main_grid.grid[4][6].exist = FALSE;
+   main_grid.grid[5][4].exist = FALSE;
+   //main_grid.grid[5][7].exist = FALSE;
+   main_grid.grid[5][6].exist = FALSE;
+   main_grid.grid[6][6].exist = FALSE;
+   main_grid.grid[6][4].exist = FALSE;
+   main_grid.grid[6][5].exist = FALSE;
   
   #pragma endregion
   int number = 0;
   
   printf("assign complete \n");
-  global_pointer_array[G_SCREEN_W] = SetCustomPointer((int*)&screenWidth, PT_INT);
-  global_pointer_array[G_SCREEN_H] = SetCustomPointer((int*)&screenHeight, PT_INT);
-  global_pointer_array[G_WORLDGRID_H] = SetCustomPointer((unsigned int*)&WorldGridHeight, PT_UINT);
-  global_pointer_array[G_WORLDGRID_W] = SetCustomPointer((unsigned int*)&WorldGridWidth, PT_UINT);
+  GLOBAL_PTR_ARRAY[G_SCREEN_W] = SetCustomPointer((int*)&screenWidth, PT_INT);
+  GLOBAL_PTR_ARRAY[G_SCREEN_H] = SetCustomPointer((int*)&screenHeight, PT_INT);
+  GLOBAL_PTR_ARRAY[G_WORLDGRID_H] = SetCustomPointer((unsigned int*)&WorldGridHeight, PT_UINT);
+  GLOBAL_PTR_ARRAY[G_WORLDGRID_W] = SetCustomPointer((unsigned int*)&WorldGridWidth, PT_UINT);
 
-  global_pointer_array[G_CURCELL] = SetCustomPointer((Cell*)&cell_on_hover, PT_CELL);
-  global_pointer_array[G_LOCK_ON_CELL] = SetCustomPointer((Cell*)&lock_on_cell, PT_CELL);
-  global_pointer_array[G_EMPTY_CELL] = SetCustomPointer((Cell*)&empty_lockon_cell, PT_CELL);
-  global_pointer_array[G_MAIN_GRID] = SetCustomPointer((CellGrid2D*)&main_grid, PT_CELL_GRID2D);
+  GLOBAL_PTR_ARRAY[G_CURCELL] = SetCustomPointer((Cell*)&cell_on_hover, PT_CELL);
+  GLOBAL_PTR_ARRAY[G_LOCK_ON_CELL] = SetCustomPointer((Cell*)&lock_on_cell, PT_CELL);
+  GLOBAL_PTR_ARRAY[G_EMPTY_CELL] = SetCustomPointer((Cell*)&empty_lockon_cell, PT_CELL);
+  GLOBAL_PTR_ARRAY[G_MAIN_GRID] = SetCustomPointer((CellGrid2D*)&main_grid, PT_CELL_GRID2D);
 
-  global_pointer_array[G_MOUSE_WORLD_POS] = SetCustomPointer((Vector2*)&mouse_world_pos, PT_VECTOR2);
-  global_pointer_array[G_INSTARRAY] = SetCustomPointer((InstanceArray*)&inst_array, PT_INST_ARRAY);
-  global_pointer_array[G_WORLDCAM] = SetCustomPointer((CameraInstance2D*)&CurrentCamera, PT_CAMERA);
+  GLOBAL_PTR_ARRAY[G_MOUSE_WORLD_POS] = SetCustomPointer((Vector2*)&mouse_world_pos, PT_VECTOR2);
+  GLOBAL_PTR_ARRAY[G_INSTARRAY] = SetCustomPointer((InstanceArray*)&inst_array, PT_INST_ARRAY);
+  GLOBAL_PTR_ARRAY[G_WORLDCAM] = SetCustomPointer((CameraInstance2D*)&CurrentCamera, PT_CAMERA);
 
-  GLOBAL_LOCKON_CELL = global_pointer_array[G_EMPTY_CELL].p_cell;
-  AddInstanceType(global_pointer_array,(Vector2){0,0}, &inst_array, &player_animation, PLAYER);
+  GLOBAL_LOCKON_CELL = GLOBAL_PTR_ARRAY[G_EMPTY_CELL].p_cell;
+  NewInstance(&g_pt_array,(Vector2){0,0}, &inst_array, &player_animation, PLAYER);
   while (!WindowShouldClose()) {
     #pragma region Step Invent
-    //inst_array.array[0].f_create(&inst_array.array[0], global_pointer_array);
+    //inst_array.array[0].f_create(&inst_array.array[0], GLOBAL_PTR_ARRAY);
     mouse_world_pos = GetScreenToWorld2D(GetMousePosition(), camera);
     number = 0;
     if(IsKeyPressed(KEY_T)){
-      AddInstanceType(global_pointer_array,(Vector2){0,0}, &inst_array, &player_animation, PLAYER);
+      NewInstance(&g_pt_array,(Vector2){0,0}, &inst_array, &player_animation, PLAYER);
     }
     #pragma region camera ivent
     //camera.target = player.pos;
@@ -126,7 +137,7 @@ int main(){
     }; 
     cell_on_hover = GetGridOnHover(mouse_world_pos, &grid_on_hover_pos, &main_grid, (GridVector2D){WorldGridWidth,WorldGridHeight}, &cell_on_hover);
     if(IsKeyPressed(KEY_R)){
-      AddInstanceType(global_pointer_array,*global_pointer_array[G_MOUSE_WORLD_POS].p_vector2D, &inst_array,  &dude_animation, ENEMY);
+      NewInstance(&g_pt_array,*GLOBAL_PTR_ARRAY[G_MOUSE_WORLD_POS].p_vector2D, &inst_array,  &dude_animation, ENEMY);
     }
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ){
       if(GLOBAL_LOCKON_CELL == &empty_lockon_cell){
@@ -137,7 +148,7 @@ int main(){
         #endif
         if(GLOBAL_LOCKON_CELL == &(MAIN_GRID_CUR_POS)){
           #if DEBUG_MODE
-            printf("lock on empty cell");
+            printf("lock on empty cell\n");
           #endif
           GLOBAL_LOCKON_CELL = &empty_lockon_cell;
         } else {
@@ -148,17 +159,22 @@ int main(){
         }
       }
     }
+    if(IsKeyDown(KEY_MINUS) && GLOBAL_CURRENT_CAMERA->zoom > MIN_ZOOM ){
+      GLOBAL_CURRENT_CAMERA->zoom -= 0.05F;
+    }else if(IsKeyDown(KEY_EQUAL) && GLOBAL_CURRENT_CAMERA->zoom < MAX_ZOOM){
+      GLOBAL_CURRENT_CAMERA->zoom += 0.05F;
+    }
     #pragma endregion
     
-    UpdateInstances(&inst_array, global_pointer_array);
+    UpdateInstances(&inst_array, GLOBAL_PTR_ARRAY);
     #pragma region Draw event
     BeginDrawing();
       ClearBackground(GRAY);
-      BeginMode2D(*CurrentCamera.camera);
+      BeginMode2D(*GLOBAL_CURRENT_CAMERA);
         UpdateDrawCells(&main_grid);
         //DrawTexture(selected_tile, (grid_on_hover_pos.x * PIXEL_SIZE)-1, (grid_on_hover_pos.y * PIXEL_SIZE)-1, WHITE);
         //DrawRectangleLines( (grid_on_hover_pos.x * PIXEL_SIZE)-1, (grid_on_hover_pos.y * PIXEL_SIZE)-1,PIXEL_SIZE+2, PIXEL_SIZE+2, YELLOW);
-        UpdateDrawInstances(&inst_array, global_pointer_array);
+        UpdateDrawInstances(&inst_array, GLOBAL_PTR_ARRAY);
         DrawRectangleLines( (cell_on_hover.grid_pos.x * PIXEL_SIZE), (cell_on_hover.grid_pos.y * PIXEL_SIZE),PIXEL_SIZE, PIXEL_SIZE, WHITE);
         if(GLOBAL_LOCKON_CELL != &empty_lockon_cell){
           DrawRectangleLines( (GLOBAL_LOCKON_CELL->grid_pos.x * PIXEL_SIZE), (GLOBAL_LOCKON_CELL->grid_pos.y * PIXEL_SIZE),PIXEL_SIZE, PIXEL_SIZE, YELLOW);
@@ -166,7 +182,7 @@ int main(){
         DrawText(TextFormat("X: %i",grid_on_hover_pos.x), mouse_world_pos.x, mouse_world_pos.y,16 ,BLACK);
         DrawText(TextFormat("Y: %i",grid_on_hover_pos.y), mouse_world_pos.x, mouse_world_pos.y+16, 16,BLACK);
       EndMode2D();
-      UpdateDrawGUIInstances(&inst_array, global_pointer_array);
+      UpdateDrawGUIInstances(&inst_array, GLOBAL_PTR_ARRAY);
       DrawText(TextFormat("%i",number), 4,4,24,BLACK);
       DrawText(TextFormat("%g",mouse_world_pos.x), 4,4+24,24,BLACK);
       DrawText(TextFormat("%g",mouse_world_pos.y), 4,4+48,24,BLACK);

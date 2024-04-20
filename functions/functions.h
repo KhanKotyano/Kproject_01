@@ -21,6 +21,11 @@
 #define _VERYHIGHT_SPEED_ANIMATION (20*_ANIMATION_FPS_OFFSET)
 #define _INSTANCE_ID 1000000000
 #define PIXEL_SIZE 32
+#define TRUE 1
+#define FALSE 0
+
+#define MAX_ZOOM 5.0F
+#define MIN_ZOOM 0.25F
 
 #define DEBUG_MODE true
 #define DEBUG_MODE_SHOW_GRID false
@@ -118,13 +123,21 @@ typedef struct Animation2D {
   Texture2D *sprite_sheet;
 } Animation2D;
 
+enum states {
+  NOT_INITIALIZED = 0,
+  INITIALIZED = 1,
+  NOT_SELECTED = 2,
+  SELECTED = 3,
+};
+
 typedef struct CustomInstVar {
   Cell *my_cell;
 }CustomInstVar;
 
 typedef struct Instance {
   u32 ID;
-  u8 exist;
+  s8 exist;
+  u8 state;
   Vector2 pos ;
   GridVector2D cell_pos;
   DEPTH_TYPE depth;

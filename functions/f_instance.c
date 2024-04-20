@@ -1,6 +1,6 @@
 #include "functions.h"
 //#include <stdlib.h>
-Instance CreateInstanceType(Vector2 _position, Animation2D *_animation, u16 _type){
+Instance CreateInstanceType(Vector2 _position, Animation2D *_animation, u16 _type, PointerArray *global_pointer_array){
   static u32 id = _INSTANCE_ID;
   Instance _new_instance = {
     .ID = id,
@@ -26,6 +26,7 @@ Instance CreateInstanceType(Vector2 _position, Animation2D *_animation, u16 _typ
   AssignFunction(&_new_instance.f_main, _type);
   AssignDrawFunction(&_new_instance.f_draw, _type);
   AssignDrawGUIFunction(&_new_instance.f_drawGUI, _type);
+  _new_instance.f_create(&_new_instance, global_pointer_array->array);
   id++;
   return _new_instance;
 };
@@ -98,8 +99,8 @@ void AddInstance( Vector2 _position, InstanceArray *a, Animation2D *_animation){
   _inst = {NULL};
 }
 
-void AddInstanceType( custom_pointer *global_pointer_array,Vector2 _position, InstanceArray *a, Animation2D *_animation, u16 _type){
-  Instance _inst = CreateInstanceType(_position, _animation, _type);
+int AddInstanceType( PointerArray *global_pointer_array,Vector2 _position, InstanceArray *a, Animation2D *_animation, u16 _type){
+  Instance _inst = CreateInstanceType(_position, _animation, _type, global_pointer_array);
   //ArrayPushInstance(_inst_array, _inst);
   if (a->used == a->size) {
     //TODO: Maybe do it as separate check/function. Rn, it not optimal solution
@@ -112,7 +113,7 @@ void AddInstanceType( custom_pointer *global_pointer_array,Vector2 _position, In
       int _free_index = FindEmptyInstance(a->array, 0, (s32)a->used);
       if(_free_index != -1){
           a->array[_free_index] = _inst;
-          return;
+          return _free_index;
       } else {
         a->size *= 2;
         a->array = (Instance*)realloc(a->array, a->size * sizeof(Instance));
@@ -123,11 +124,12 @@ void AddInstanceType( custom_pointer *global_pointer_array,Vector2 _position, In
   } 
 
   a->array[a->used++] = _inst;
-  printf("before create ivent\n");
-  //a->array[a->used].custom_var.my_cell = global_pointer_array[G_LOCK_ON_CELL].p_cell;
-  //global_pointer_array[G_MAIN_GRID].p_grid_cell2D->grid[5][5].exist = 0;
-  //a->array[a->used].f_create(&a->array[a->used], global_pointer_array);
-  _inst = {NULL};
+  return a->used-1;
+}
+void NewInstance( PointerArray *global_pointer_array,Vector2 _position, InstanceArray *a, Animation2D *_animation, u16 _type){
+  AddInstanceType( global_pointer_array, _position,  a,  _animation,  _type);
+  
+  //a->array[_index].f_create(&a->array[a->used], global_pointer_array->array);
 }
 
 
