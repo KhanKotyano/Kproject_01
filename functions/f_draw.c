@@ -22,6 +22,7 @@ Animation2D CreateAnimation2D(Texture2D *_sprite_sheet, u8 _number_of_sprites, u
     .frame_counter = 0,
     .max_frames = (u8)(_number_of_sprites-1),
     .curretnt_frame = 0,
+    .color = (Color){255,255,255,255},
     .frame_rectangle = {0.0f, 0.0f, (float)_sprite_sheet->width/_number_of_sprites, (float)_sprite_sheet->height },
     .sprite_sheet = _sprite_sheet
   };
@@ -39,6 +40,7 @@ Animation2D InheritAnimation2D(Animation2D *_sourse, u8 _animation_speed){
     .frame_counter = 0,
     .max_frames = _sourse->max_frames,
     .curretnt_frame = 0,
+    .color = WHITE,
     .frame_rectangle = _sourse->frame_rectangle,
     .sprite_sheet = _sourse->sprite_sheet
   };
@@ -50,10 +52,10 @@ Animation2D InheritAnimation2D(Animation2D *_sourse, u8 _animation_speed){
 
 void DrawAndAnimate(Instance *_inst){
     GetFrameAnimation(&_inst->animation);
-    DrawTextureRec(*_inst->animation.sprite_sheet,_inst->animation.frame_rectangle, _inst->pos, (Color){255,255,255,255});
+    DrawTextureRec(*_inst->animation.sprite_sheet,_inst->animation.frame_rectangle, _inst->pos, _inst->animation.color);
 };
 void DrawSelf(Instance *self){
-  DrawTextureRec(*self->animation.sprite_sheet,self->animation.frame_rectangle, self->pos, WHITE);
+  DrawTextureRec(*self->animation.sprite_sheet,self->animation.frame_rectangle, self->pos, self->animation.color);
 };
 void GetFrameAnimation(Animation2D *_animation){
     _animation->frame_counter++;
@@ -67,5 +69,9 @@ void GetFrameAnimation(Animation2D *_animation){
 
 void DrawAnimation(Animation2D *_animation, Vector2 _pos){
     GetFrameAnimation(_animation);
-    DrawTextureRec(*_animation->sprite_sheet,_animation->frame_rectangle, _pos, (Color){255,255,255,255});
+    //Color _temp_col = WHITE;
+    DrawTextureRec(*_animation->sprite_sheet,_animation->frame_rectangle, _pos, _animation->color);
+    #if true
+      _animation->color = WHITE;
+    #endif
 }

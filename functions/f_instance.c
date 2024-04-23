@@ -14,7 +14,7 @@ Instance CreateInstanceType(Vector2 _position, Animation2D *_animation, u16 _typ
     case NOTHING:{
       _new_instance.depth = 0;
     }break;
-    case PLAYER:{
+    case SOLDER:{
       _new_instance.depth = 45;
       //_new_instance.f_test_main = &OtherPlayerMain;
     }break;
@@ -208,7 +208,8 @@ void UpdateDrawCells(CellGrid2D *cell_grid){
       if(!_cur_cell->exist){
       continue;
       }
-      DrawTexture(*_cur_cell->static_sprite, PIXEL_SIZE * w,PIXEL_SIZE * h, WHITE);
+      DrawAnimation(&_cur_cell->animation, {(float)PIXEL_SIZE * w, (float)PIXEL_SIZE * h,});
+      //DrawTexture(*_cur_cell->static_sprite, PIXEL_SIZE * w,PIXEL_SIZE * h, WHITE);
     }
   }
 }

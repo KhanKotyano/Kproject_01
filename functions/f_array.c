@@ -4,12 +4,15 @@
 #ifndef _EMPTY
   #define _EMPTY 0
 #endif
+#ifndef _EMPTY_INT
+  #define _EMPTY_INT -2
+#endif
 #pragma region Array Integer Implementation
 
 
 void EmptyIntArray(IntArray *a, int _offset){
   for(int i = _offset;i< (int)a->size;i++){
-    a->array[i] = _EMPTY;
+    a->array[i] = _EMPTY_INT;
   }
 };
 void InitArrayInt(IntArray *a, size_t initialSize) {
@@ -30,7 +33,7 @@ void ArrayPushInt(IntArray *a, int element) {
   a->array[a->used++] = element;
 }
 void ArrayEmptyIndexInt(IntArray *a, int _index){
-  a->array[_index] = _EMPTY;
+  a->array[_index] = _EMPTY_INT;
 }
 void ArraySetIndexInt(IntArray *a, int _index, int _value){
   a->array[_index] = _value;
@@ -38,7 +41,7 @@ void ArraySetIndexInt(IntArray *a, int _index, int _value){
 
 int FindNotEmptyInt(int *array, s32 _offset, s32 _max_lng){
   for(s32 i = _offset;i < _max_lng;i++){
-    if(array[i] != _EMPTY){
+    if(array[i] != _EMPTY_INT){
       return i;
     }
   }
@@ -47,14 +50,15 @@ int FindNotEmptyInt(int *array, s32 _offset, s32 _max_lng){
 bool RedoIntArray(IntArray *a){
   int _counter = 0;
   for(s32 i = 0;i < (s32)a->used;i++){
-    if(a->array[i] == _EMPTY){
+    if(a->array[i] == _EMPTY_INT){
       _counter = i;
       int _empty_index = FindNotEmptyInt(a->array, i, a->used);
       if(_empty_index != -1){
         a->array[i] = a->array[_empty_index];
-        a->array[_empty_index] = _EMPTY;
+        a->array[_empty_index] = _EMPTY_INT;
       } else {
         a->used = (size_t)_counter;
+        //a->used--;
         //array has space and it's been restructured
         return true;
       }
@@ -69,6 +73,10 @@ void freeArrayInt(IntArray *a) {
   free(a->array);
   a->array = NULL;
   a->used = a->size = 0;
+};
+void freeUsedAInt(IntArray *a) {
+  ArrayEmptyIndexInt(a, 0);
+  a->used = 0;
 };
 #pragma endregion
 

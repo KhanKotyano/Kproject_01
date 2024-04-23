@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "../rlib/raylib.h"
+//#include "../functions_lib/AStar.h"
 #define _NEAR_BLACK (Color){15, 15, 15, 255}
 #define _MAX_INSTANCES 16
 #define _TARGET_FPS 60
@@ -74,7 +75,7 @@ enum global {
 
 enum INST_TYPE {
   NOTHING = 0,
-  PLAYER = 1,
+  SOLDER = 1,
   ENEMY = 2
 
 };
@@ -90,6 +91,22 @@ enum VAR_TYPE{
   T_FLOAT = 7,
   T_DOUBLE = 8,
  
+};
+enum MOVE_TYPE {
+  STATIC = 0,
+  WALK = 1,
+  SWIM = 2,
+  FLY = 3,
+  AMPHIBIOUS = 4,
+  GROUND_AND_AIR = 5,
+  AIR_AND_WATER = 6,
+  ALL = 7
+};
+enum CELL_WALK_TYPE {
+  NONE = 0,
+  LAND = 1,
+  SEA = 2,
+  AIR = 3
 };
 
 typedef struct custom_variable{
@@ -119,6 +136,7 @@ typedef struct Animation2D {
   u8 frame_counter;
   u8 max_frames;
   u8 curretnt_frame;
+  Color color;
   Rectangle frame_rectangle;
   Texture2D *sprite_sheet;
 } Animation2D;
@@ -189,6 +207,14 @@ typedef struct CameraInstance2D {
   Vector2 target_pos;
   Camera2D *camera;
 }CameraInstance;
+typedef struct Terrain {
+  u8 type;
+  u8 move_cost;
+}Terrain;
+typedef struct NaturalProperties {
+  Terrain *terrain;
+
+} NaturalProperties;
 
 typedef struct Grid2D { 
   unsigned int width;
@@ -197,8 +223,10 @@ typedef struct Grid2D {
 }Grid2D;
 typedef struct Cell{
   GridVector2D grid_pos;
-  Texture2D *static_sprite;
+  NaturalProperties nature;
+  Animation2D animation;
   u8 exist;
+  u32 ID;
   Instance *contaned_inst;
 }Cell;
 typedef struct CellGrid2D { 
@@ -285,7 +313,7 @@ typedef struct PointerArray {
 }PointerArray;
 
 
-
+//#include "../functions_lib/AStar.c"
 #include "f_common.c"
 #include "f_array.c"
 #include "f_stack.c"

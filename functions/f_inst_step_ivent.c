@@ -1,5 +1,5 @@
 #include "functions.h"
-void PlayerMain(Instance *self, custom_pointer *global_pointer_array){
+void SolderMain(Instance *self, custom_pointer *global_pointer_array){
   if(self->state == SELECTED){
     if(global_pointer_array[G_LOCK_ON_CELL].p_cell != self->custom_var.my_cell  
     && global_pointer_array[G_LOCK_ON_CELL].p_cell != global_pointer_array[G_EMPTY_CELL].p_cell){
@@ -15,9 +15,9 @@ void PlayerMain(Instance *self, custom_pointer *global_pointer_array){
     self->state = NOT_SELECTED;
   }
 }
-void PlayerCreate(Instance *self, custom_pointer *global_pointer_array){
+void SolderCreate(Instance *self, custom_pointer *global_pointer_array){
   //self->depth = GetRandomValue(1, 100);
-  printf("Player Created : %d\n", self->ID);
+  printf("SOLDER Created : %d\n", self->ID);
   self->exist = TRUE;
   self->state = INITIALIZED;
   self->custom_var.my_cell = &(global_pointer_array[G_MAIN_GRID].p_grid_cell2D->
@@ -33,8 +33,8 @@ void DumpFunction(Instance *self, custom_pointer*){return;};
 
 void AssignFunction(void(**function)(Instance*, custom_pointer*), u16 _type){
   switch(_type){
-    case PLAYER:{
-      *function = &PlayerMain;
+    case SOLDER:{
+      *function = &SolderMain;
     }break;
     case ENEMY:{
       *function = &DumpFunction;
@@ -47,8 +47,8 @@ void AssignFunction(void(**function)(Instance*, custom_pointer*), u16 _type){
 };
 void AssignCreateFunction(void(**function)(Instance*, custom_pointer*), u16 _type){
   switch(_type){
-    case PLAYER:{
-      *function = &PlayerCreate;
+    case SOLDER:{
+      *function = &SolderCreate;
     }break;
     case ENEMY:{
       *function = &DumpFunction;

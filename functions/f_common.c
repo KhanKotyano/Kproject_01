@@ -251,6 +251,7 @@ CellGrid2D CreateCellGrid2D(unsigned int _width, unsigned int _height){
       j++;
       _temp_grid2d.grid[h][w].grid_pos = (GridVector2D){w, h};
       _temp_grid2d.grid[h][w].exist = 1;
+      _temp_grid2d.grid[h][w].ID = w + (h * (_width));
       #if DEBUG_MODE_SHOW_GRID
         printf("x:%d y:%d pos:%d,%d \n", w , h, _temp_grid2d.grid[h][w].grid_pos.x,_temp_grid2d.grid[h][w].grid_pos.y);
       #endif
