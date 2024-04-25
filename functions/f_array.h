@@ -1,8 +1,9 @@
 //#include "functions.h"
 #include <stdlib.h>
 //#include <time.h>
-#ifndef _EMPTY
-  #define _EMPTY 0
+#ifndef _EMPTY_INSTANCE
+  static Instance empty = {0};
+  #define _EMPTY_INSTANCE empty
 #endif
 #ifndef _EMPTY_INT
   #define _EMPTY_INT -2
@@ -83,7 +84,7 @@ void freeUsedAInt(IntArray *a) {
 #pragma region Inst Array
 void EmptyInstanceArray(InstanceArray *a, int _offset){
   for(int i = _offset;i< (int)a->size;i++){
-    a->array[i] = {_EMPTY};
+    a->array[i] = _EMPTY_INSTANCE;
   }
 }
 void InitArrayInstance(InstanceArray *a, size_t initialSize) {
@@ -106,7 +107,7 @@ void ArrayPushInstance(InstanceArray *a, Instance _instance) {
 
 
 void ArrayEmptyIndexInstance(InstanceArray *a, int _index){
-  a->array[_index] = {0};
+  a->array[_index] = _EMPTY_INSTANCE;
 }
 void ArraySetIndexInstance(InstanceArray *a, int _index, Instance _instance){
   a->array[_index] = _instance;
@@ -137,7 +138,7 @@ bool RedoInstanceArray(InstanceArray *a){
       int _empty_index = FindNotEmptyInstance(a->array, i, a->used);
       if(_empty_index != -1){
         a->array[i] = a->array[_empty_index];
-        a->array[_empty_index] = {_EMPTY};
+        a->array[_empty_index] = _EMPTY_INSTANCE;
       } else {
         a->used = (size_t)_counter;
         //array has space and it's been restructured
@@ -159,7 +160,8 @@ void freeArrayInstance(InstanceArray *a) {
 
 void EmptyPtrArray(PointerArray *a, int _offset){
   for(int i = _offset;i< (int)a->size;i++){
-    a->array[i] = {_EMPTY};
+    a->array[i].p_void = NULL;
+    a->array[i].pointer_type = PT_VOID;
   }
 };
 void InitArrayPtr(PointerArray *a, size_t initialSize) {
@@ -178,7 +180,8 @@ void ArrayPushPtr(PointerArray *a, custom_pointer element) {
   a->array[a->used++] = element;
 }
 void ArrayEmptyIndexPtr(PointerArray *a, int _index){
-  a->array[_index] = {0};
+  a->array[_index].p_void = NULL;
+  a->array[_index].pointer_type = PT_VOID;
 }
 void ArraySetIndexPtr(PointerArray *a, int _index, custom_pointer _value){
   a->array[_index] = _value;

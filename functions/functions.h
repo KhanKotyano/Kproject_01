@@ -1,5 +1,5 @@
 #ifndef _KFUNCTIONS_H
-#define _KFUNCTIONS_H
+#define _KFUNCTIONS_H true
 //#include "UIC.h"
 
 #include <stdio.h>
@@ -32,6 +32,7 @@
 #define DEBUG_MODE_SHOW_GRID false
 #define DEBUG_MODE_SHOW_SIZE true
 #define MAX_INSTANCES_IN_CELL 64
+#define RANDOM_GRID_FLAG true
 
 /*#ifndef _CUSTOM_DEF
   #define _CUSTOM_DEF
@@ -55,9 +56,11 @@ typedef signed long s64;
 typedef unsigned long u64;
 typedef float f32;
 typedef double f64;
-struct custom_pointer;
-struct Instance;
-struct Cell;
+typedef struct custom_pointer custom_pointer;
+typedef struct Instance Instance;
+typedef struct Cell Cell;
+typedef struct CameraInstance2D CameraInstance2D;
+typedef struct NaturalProperties NaturalProperties;
 
 enum global {
   G_SCREEN_W,
@@ -147,7 +150,22 @@ enum states {
   NOT_SELECTED = 2,
   SELECTED = 3,
 };
+typedef struct Terrain {
+  u8 type;
+  u8 move_cost;
+}Terrain;
+typedef struct NaturalProperties {
+  Terrain *terrain;
 
+} NaturalProperties;
+typedef struct Cell{
+  GridVector2D grid_pos;
+  NaturalProperties nature;
+  Animation2D animation;
+  u8 exist;
+  u32 ID;
+  Instance *contaned_inst;
+}Cell;
 typedef struct CustomInstVar {
   Cell *my_cell;
 }CustomInstVar;
@@ -206,29 +224,16 @@ typedef struct CameraInstance2D {
   Instance *target_instance;
   Vector2 target_pos;
   Camera2D *camera;
-}CameraInstance;
-typedef struct Terrain {
-  u8 type;
-  u8 move_cost;
-}Terrain;
-typedef struct NaturalProperties {
-  Terrain *terrain;
+}CameraInstance2D;
 
-} NaturalProperties;
+
 
 typedef struct Grid2D { 
   unsigned int width;
   unsigned int height;
   unsigned int **grid;
 }Grid2D;
-typedef struct Cell{
-  GridVector2D grid_pos;
-  NaturalProperties nature;
-  Animation2D animation;
-  u8 exist;
-  u32 ID;
-  Instance *contaned_inst;
-}Cell;
+
 typedef struct CellGrid2D { 
   unsigned int width;
   unsigned int height;
@@ -255,9 +260,9 @@ enum P_TYPE{
 
 
 //Instances
-void DumpFunction(Instance *self);
-void DrawSelf(Instance *self);
-void AnimateSelf(Instance *self);
+//void DumpFunction(Instance *self);
+//void DrawSelf(Instance *self);
+//void AnimateSelf(Instance *self);
 //void PlayerIvent(Instance *self);
 //void AddInstance( Vector2 _position, InstanceArray *_inst_array, Texture2D *_sprite, Animation2D *_animation);
 void UpdateInstances(InstanceArray *_inst_array, custom_pointer *global_pointer_array);
@@ -314,13 +319,13 @@ typedef struct PointerArray {
 
 
 //#include "../functions_lib/AStar.c"
-#include "f_common.c"
-#include "f_array.c"
-#include "f_stack.c"
-#include "f_draw.c"
-#include "UIC.c"
-#include "f_inst_step_ivent.c"
-#include "f_inst_draw_ivent.c"
-#include "f_instance.c"
+#include "f_common.h"
+#include "f_array.h"
+#include "f_stack.h"
+#include "f_draw.h"
+//#include "UIC.c"
+#include "f_inst_step_ivent.h"
+#include "f_inst_draw_ivent.h"
+#include "f_instance.h"
 
 #endif
