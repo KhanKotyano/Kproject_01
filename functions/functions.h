@@ -152,7 +152,7 @@ enum states {
 };
 typedef struct Terrain {
   u8 type;
-  u8 move_cost;
+  u16 move_cost;
 }Terrain;
 typedef struct NaturalProperties {
   Terrain *terrain;

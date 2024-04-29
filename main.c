@@ -11,6 +11,7 @@
 #include "rlib/rlgl.h"
 #define ABS _abs64
 #define or ||
+#define and &&
 #include "functions/functions.h"
 
 
@@ -58,6 +59,8 @@ PointerArray g_pt_array;
 typedef struct ASNode {
   GridVector2D pos;
   int F;
+  int H;
+  int G;
   u8 can_move;
   int parent_index;
   int border_nodes_size;
@@ -78,7 +81,11 @@ typedef struct ASPath {
   IntArray closed;
   ASNode *node_map;
   IntArray final_path;
-  IntArray priority;
+  int *priority_list;
+  int *g_list;
+  int *h_list;
+  unsigned int max_w;
+  unsigned int max_h;
 }ASPath;
 void OpenNode(NodeArray *open_node, ASNode *current_node){
   (open_node->array)[open_node->used_size++] = current_node;
@@ -97,9 +104,7 @@ unsigned int GetMaxFCost(NodeArray *node_str){
   return hight_index;
 };
 unsigned int GetMaxFCostIndex(IntArray *node_str, ASNode *path_array){
-  //node_str->array;
   int return_val;
-  
   unsigned int hight_index = 0;
   int prev_max_val = path_array[node_str->array[hight_index]].F;
   for(unsigned int i = 0;i < node_str->used;i++){
@@ -107,11 +112,8 @@ unsigned int GetMaxFCostIndex(IntArray *node_str, ASNode *path_array){
       hight_index = i;
     }
   }
-  
   return_val = (int)(node_str->array[hight_index]);
-  //printf("return val:%d", return_val);
   ArrayEmptyIndexInt(node_str, hight_index);
-  //printf("after return val:%d", return_val);
   return return_val;
 };
 unsigned int GetMinValIndexArray(int *array, int *array2,unsigned int array_size){
@@ -119,8 +121,10 @@ unsigned int GetMinValIndexArray(int *array, int *array2,unsigned int array_size
   unsigned int min_index = 0;
   unsigned int i;
   for(i = 0;i<array_size;i++){
-    if(array[array2[i]] < array[min_index]){min_index = i;}
+    //printf("val[%u]:%d\n", i,array[array2[i]]);
+    if(array[array2[i]] < array[array2[min_index]]){min_index = i;}
   }
+  //printf("min_val[%u]:%d\n",min_index,array[array2[min_index]]);
   return_val = (int)(array2[min_index]);
   array2[min_index] = _EMPTY_INT;
   return return_val;
@@ -142,7 +146,9 @@ void CreateASNode(CellGrid2D *from_grid, ASNode **ASNode_array){
     for(u32 x = 0;x<total_width;x++){
       cur_index = x + (y * (total_width));
       (*ASNode_array)[cur_index].can_move = from_grid->grid[y][x].exist;
-      (*ASNode_array)[cur_index].F = 0;//(int)(from_grid->grid[y][x].nature.terrain->move_cost);
+      (*ASNode_array)[cur_index].G = (int)(from_grid->grid[y][x].nature.terrain->move_cost);
+      (*ASNode_array)[cur_index].H = 0;
+      (*ASNode_array)[cur_index].F = 0;
       (*ASNode_array)[cur_index].border_nodes_size = 0;
       (*ASNode_array)[cur_index].pos = (GridVector2D){.x = x,.y = y};
       // y0 x0 tw:6, th:4
@@ -174,17 +180,111 @@ void CreateASNode(CellGrid2D *from_grid, ASNode **ASNode_array){
     }
   }
 }
-int IsThisCloseGrid(GridVector2D a, GridVector2D b){
-  return (int)(_abs64(a.x - b.x) + _abs64(a.y - b.y));
+int GridDistance(GridVector2D a, GridVector2D b){
+  return (int)(abs(a.x - b.x) + abs(a.y - b.y));
 }
-void AStar2(IntArray *open,IntArray *closed, GridVector2D max_pos, ASNode *path_array, GridVector2D from_node, GridVector2D target_node
-            , IntArray *path_index){
-  unsigned int max_index = max_pos.x * max_pos.y;
-  unsigned int from_index = (from_node.x + (from_node.y * max_pos.x));
-  unsigned int target_index = (target_node.x + (target_node.y * max_pos.x));
-  if(path_array[target_index].can_move){
+
+void FindPathDi(ASPath *Path, GridVector2D from_node, GridVector2D target_node){
+  unsigned int max_index = Path->max_h * Path->max_w;
+  unsigned int from_index = (from_node.x + (from_node.y * Path->max_w));
+  unsigned int target_index = (target_node.x + (target_node.y * Path->max_w));
+  IntArray *open = &Path->open;
+  IntArray *closed = &Path->closed;
+  IntArray *final_path = &Path->final_path;
+  if(Path->node_map[target_index].can_move){
     ArrayPushInt(open, from_index );
-    //ArrayPushInt(closed, from_index );
+    int cur_border_index;
+    #if DEBUG_MODE
+      printf("START DICK \n");
+    #endif
+    int iteration = 0;
+    int cost_so_far = 0;
+    int new_cost = 0;
+    unsigned int current_index = 0;
+    for(int i = 0; i < max_index;i++){
+      Path->node_map[i].H = GridDistance(Path->node_map[i].pos, Path->node_map[target_index].pos);
+      Path->h_list[i] = Path->node_map[i].H;
+      Path->g_list[i] = Path->node_map[i].G;
+      Path->node_map[i].F = Path->node_map[i].H + Path->node_map[i].G;
+      Path->priority_list[i] = Path->node_map[i].F;
+      //printf("node map f: %d\n", Path->node_map[i].F);
+    }
+    current_index = from_index;
+    while(open->used){
+      iteration++;
+      //current_index = GetMaxFCostIndex(open, Path->node_map);//index2D of path_array
+      
+      #if DEBUG_MODE
+        printf("iteration:%d curr_index:%u\n", iteration, current_index);
+      #endif
+      if(current_index == target_index){
+        #if DEBUG_MODE
+          printf("path exist: cur_index:%u || target_index:%u \n", current_index, target_index);
+        #endif
+        
+        while(current_index != from_index ){
+          #if DEBUG_MODE
+            printf("current path index: %u\n", current_index);
+          #endif
+          ArrayPushInt(final_path,current_index);
+          current_index = Path->node_map[current_index].parent_index;
+        }
+        #if DEBUG_MODE
+          printf("total path lenght: %llu\n", final_path->used);
+        #endif
+        RedoIntArray(open); //Shift quque
+        return;
+      }
+      
+      for(int i = 0;i < Path->node_map[current_index].border_nodes_size;i++){
+        cur_border_index = Path->node_map[current_index].border_nodes_index[i];
+        if(  !(Path->node_map[cur_border_index].can_move) or IsIndexInArray(closed, cur_border_index) ){ //
+          continue;
+        } 
+        new_cost = abs(Path->g_list[current_index] - ((( Path->h_list[current_index] - Path->h_list[cur_border_index])) * Path->g_list[cur_border_index])); 
+        if(new_cost < Path->priority_list[current_index] or !IsIndexInArray(open, cur_border_index)){ //
+          Path->node_map[cur_border_index].parent_index = current_index;
+          Path->g_list[cur_border_index] = new_cost + Path->g_list[cur_border_index];
+          Path->priority_list[cur_border_index] = Path->g_list[cur_border_index];// + Path->h_list[cur_border_index];
+          if(!IsIndexInArray(open, cur_border_index )){ //and !IsIndexInArray(closed, cur_border_index)
+            ArrayPushInt(open, cur_border_index);
+          }
+        }
+        
+      }
+      /*
+
+      */
+     
+      ArrayPushInt(closed, current_index);
+      RedoIntArray(open);
+      current_index = GetMinValIndexArray(Path->priority_list, open->array,open->used);
+      //RedoIntArray(open);
+      
+    }
+  }
+}
+
+void CreatePath(ASPath *path, CellGrid2D *main_grid){
+  CreateASNode(main_grid, &path->node_map);
+  InitArrayInt(&path->open, (size_t)(sizeof(int ) * (main_grid->width *main_grid->height)));
+  InitArrayInt(&path->closed, (size_t)(sizeof(int ) * (main_grid->width *main_grid->height)));
+  InitArrayInt(&path->final_path, (size_t)(sizeof(int ) * (main_grid->width *main_grid->height)));
+  path->priority_list = (int *)malloc(sizeof(int) * (main_grid->width *main_grid->height));
+  path->g_list = (int *)malloc(sizeof(int) * (main_grid->width *main_grid->height));
+  path->h_list = (int *)malloc(sizeof(int) * (main_grid->width *main_grid->height));
+  path->max_h = main_grid->height;
+  path->max_w = main_grid->width;
+}
+/*void FindPathASTAR(ASPath *Path, GridVector2D from_node, GridVector2D target_node){
+  unsigned int max_index = Path->max_h * Path->max_w;
+  unsigned int from_index = (from_node.x + (from_node.y * Path->max_w));
+  unsigned int target_index = (target_node.x + (target_node.y * Path->max_w));
+  IntArray *open = &Path->open;
+  IntArray *closed = &Path->closed;
+  IntArray *final_path = &Path->final_path;
+  if(Path->node_map[target_index].can_move){
+    ArrayPushInt(open, from_index );
     int cur_border_index;
     #if DEBUG_MODE
       printf("START ASTAR \n");
@@ -192,22 +292,16 @@ void AStar2(IntArray *open,IntArray *closed, GridVector2D max_pos, ASNode *path_
     int iteration = 0;
     int cost_so_far = 0;
     unsigned int current_index = 0;
-    int *priority_list = (int*)malloc(sizeof(int) * (max_index));
     for(int i = 0; i < max_index;i++){
-      priority_list[i] = path_array[i].F;
+      Path->priority_list[i] = Path->node_map[i].F;
+      // Path->priority_list[i] = Path->node_map[i].F;
     }
     
     while(open->used){
-      //printf("open used:%llu | open value %d\n", open->used, open->array[open->used-1]);
       iteration++;
-      //printf("open used:%llu | open value %d\n", open->used, open->array[open->used-1]);
-      current_index = GetMaxFCostIndex(open, path_array);//index2D of path_array
-      //current_index = GetMinValIndexArray(priority_list, open->array,open->used);
+      //current_index = GetMaxFCostIndex(open, Path->node_map);//index2D of path_array
+      current_index = GetMinValIndexArray(Path->priority_list, open->array,open->used);
       RedoIntArray(open);
-      //printf("curr_index:%u\n", current_index); 
-      //ArrayEmptyIndexInt(open, current_index);
-      
-      
       ArrayPushInt(closed, current_index);
       #if DEBUG_MODE
         printf("iteration:%d curr_index:%u\n", iteration, current_index);
@@ -218,38 +312,44 @@ void AStar2(IntArray *open,IntArray *closed, GridVector2D max_pos, ASNode *path_
         #endif
         
         while(current_index != from_index ){
-          printf("current path index: %u\n", current_index);
-          ArrayPushInt(path_index,current_index);
-          current_index = path_array[current_index].parent_index;
+          #if DEBUG_MODE
+            printf("current path index: %u\n", current_index);
+          #endif
+          ArrayPushInt(final_path,current_index);
+          current_index = Path->node_map[current_index].parent_index;
         }
-        printf("total path lenght: %llu\n", path_index->used);
+        #if DEBUG_MODE
+          printf("total path lenght: %llu\n", final_path->used);
+        #endif
         RedoIntArray(open); //Shift quque
-        free(priority_list);
-        //RedoIntArray(closed);
         return;
       }
       int priority = 0;
-      for(int i = 0;i < path_array[current_index].border_nodes_size;i++){
-        cur_border_index = path_array[current_index].border_nodes_index[i];
-        if( IsIndexInArray(closed, cur_border_index) or !(path_array[cur_border_index].can_move) ){
+      int starting_prior;
+      for(int i = 0;i < Path->node_map[current_index].border_nodes_size;i++){
+        cur_border_index = Path->node_map[current_index].border_nodes_index[i];
+        if( IsIndexInArray(closed, cur_border_index) or !(Path->node_map[cur_border_index].can_move) ){
           continue;
         } 
-        priority = IsThisCloseGrid( path_array[cur_border_index].pos ,path_array[target_index].pos); 
-        priority -= IsThisCloseGrid( path_array[cur_border_index].pos,  path_array[from_index].pos);
-        priority_list[cur_border_index] = priority;
-        if(!IsIndexInArray(open, cur_border_index) or priority_list[cur_border_index] >= priority_list[current_index]){
-          path_array[cur_border_index].parent_index = current_index;
+        starting_prior = Path->priority_list[cur_border_index];
+        priority= starting_prior;
+        
+        //priority += (IsThisCloseGrid( Path->node_map[cur_border_index].pos , Path->node_map[target_index].pos)); 
+        //priority -= (IsThisCloseGrid( Path->node_map[cur_border_index].pos,  Path->node_map[from_index].pos) * starting_prior);
+        if(!IsIndexInArray(open, cur_border_index) or priority <= cost_so_far){
+          Path->node_map[cur_border_index].parent_index = current_index;
+          //Path->priority_list[current_index] = priority;
+          cost_so_far += priority;
+          //cost_so_far = Path->priority_list[cur_border_index];
           if(!IsIndexInArray(open, cur_border_index)){
             ArrayPushInt(open, cur_border_index);
           }
         }
       }
-      //printf("open size:%llu \n",open->used);
-      //RedoIntArray(open);
     }
-    free(priority_list);
   }
-}
+}*/
+
 
 
 
@@ -258,26 +358,11 @@ int main(){
   SetTargetFPS(_TARGET_FPS);
   InitArrayInstance(&inst_array, 16);
   InitArrayPtr(&g_pt_array, 1280);
-  //InitArray(&inst_array, 16);
-  //InitArrayPtr()
-  //ASPathCreate(&path_source, NULL, &(GridVector2D){1,1}, &(GridVector2D){10,10});
   
   #if DEBUG_MODE
     
     printf("sizeof pt_array: %llu \n", sizeof(*g_pt_array.array) * g_pt_array.size);
     printf("sizeof inst array: %llu \n", sizeof(*inst_array.array )* inst_array.size);
-    /*IntArray array; 
-    InitArrayInt(&array, 32);
-    for(int i = 0; i< array.size; i++){
-      array.array[i] = i;
-    }
-    EmptyIntArray(&array, 0);
-    RedoIntArray(&array);
-    for(int i = 0; i< array.used; i++){
-      printf("array[%d]: %d \n", i, array.array[i]);
-    }
-    printf("array used: %d", array.used);
-    freeArrayInt(&array);*/
   #endif
   CellGrid2D main_grid = CreateCellGrid2D(WorldGridWidth, WorldGridHeight);
   
@@ -298,33 +383,34 @@ int main(){
   Texture2D player_animation_sprite = LoadTexture("sprites/player32.png");
   Texture2D dude_animation_sprite = LoadTexture("sprites/test32.png");
   Texture2D grass_tile = LoadTexture("sprites/grass_tile.png");
+  Texture2D rock_tile = LoadTexture("sprites/rock_tile.png");
   Texture2D selected_tile = LoadTexture("sprites/grid_selected.png");
   Texture2D solder_sprite = LoadTexture("sprites/solder.png");
   Texture2D red_tile = LoadTexture("sprites/red_tile.png");
   Texture2D blue_tile = LoadTexture("sprites/blue_tile.png");
-  #pragma endregion
-  #pragma region Create Instance
-  
   Animation2D player_animation = CreateAnimation2D(&player_animation_sprite, 1, _LOW_SPEED_ANIMATION);
   Animation2D solder_animation = CreateAnimation2D(&solder_sprite, 1, _LOW_SPEED_ANIMATION);
   Animation2D dude_animation = CreateAnimation2D(&dude_animation_sprite, 6, _HIGHT_SPEED_ANIMATION-10);
   Animation2D grass_animation = CreateAnimation2D(&grass_tile, 1, _LOW_SPEED_ANIMATION);
+  Animation2D rock_animation = CreateAnimation2D(&rock_tile, 1, _LOW_SPEED_ANIMATION);
   Animation2D red_tile_animation = CreateAnimation2D(&red_tile, 1, _LOW_SPEED_ANIMATION);
   Animation2D blue_tile_animation = CreateAnimation2D(&blue_tile, 1, _LOW_SPEED_ANIMATION);
 
   Animation2D empty_animation;
+  #pragma endregion
+  #pragma region Create Instance
+  
+  
   Terrain Terrain_Grass = {
     .type = LAND,
-    .move_cost = 10
+    .move_cost = 4,
   };
-  for(u32 i = 0;i<main_grid.height;i++){
-    for(u32 ii = 0;ii<main_grid.width;ii++){
-      main_grid.grid[i][ii].animation = grass_animation;
-      //main_grid.grid[i][ii].animation = grass_animation;
-      main_grid.grid[i][ii].nature.terrain = &Terrain_Grass;
-    }
-  }
-   /*main_grid.grid[4][4].exist = FALSE;
+  Terrain Terrain_Rocks = {
+    .type = LAND,
+    .move_cost = 64,
+  };
+  
+  /*main_grid.grid[4][4].exist = FALSE;
    main_grid.grid[4][5].exist = FALSE;
    main_grid.grid[4][6].exist = FALSE;
    main_grid.grid[5][4].exist = FALSE;
@@ -335,6 +421,17 @@ int main(){
    main_grid.grid[6][5].exist = FALSE;*/
   
   #pragma endregion
+  for(u32 i = 0;i<main_grid.height;i++){
+    for(u32 ii = 0;ii<main_grid.width;ii++){
+      if(!GetRandomValue(0,5)){
+        main_grid.grid[i][ii].animation = rock_animation;
+        main_grid.grid[i][ii].nature.terrain = &Terrain_Rocks;
+      } else {
+        main_grid.grid[i][ii].animation = grass_animation;
+        main_grid.grid[i][ii].nature.terrain = &Terrain_Grass;
+      }
+    }
+  }
   int number = 0;
   
   printf("assign complete \n");
@@ -355,21 +452,18 @@ int main(){
   GLOBAL_LOCKON_CELL = GLOBAL_PTR_ARRAY[G_EMPTY_CELL].p_cell;
   NewInstance(&g_pt_array,(Vector2){0,0}, &inst_array, &solder_animation, SOLDER);
   ASPath path;
-  CreateASNode(&main_grid, &path.node_map);
+  CreatePath(&path, &main_grid);
+  /*CreateASNode(&main_grid, &path.node_map);
   InitArrayInt(&path.open, (size_t)(sizeof(int ) * (main_grid.width *main_grid.height)));
   InitArrayInt(&path.closed, (size_t)(sizeof(int ) * (main_grid.width *main_grid.height)));
   InitArrayInt(&path.final_path, (size_t)(sizeof(int ) * (main_grid.width *main_grid.height)));
-  #if DEBUG_MODE
-    //pathfinding_govna
-    //CreateASNode(&main_grid, &path.node_map);
-    //InitArrayInt(&path.open, (size_t)(sizeof(int ) * (main_grid.width *main_grid.height)));
-    //InitArrayInt(&path.closed, (size_t)(sizeof(int ) * (main_grid.width *main_grid.height)));
-    //InitArrayInt(&path.final_path, (size_t)(sizeof(int ) * (main_grid.width *main_grid.height)));
-    /*AStar2(&path.open, &path.closed, (GridVector2D){.x = main_grid.width ,.y =main_grid.height },path.node_map
-    , (GridVector2D){0,0}, (GridVector2D){5,5}
-    , &path.final_path);*/
-    //printf("open used: %llu \n", path.open.used);
-  #endif
+  path.priority_list = (int *)malloc(sizeof(int) * (main_grid.width *main_grid.height));
+  path.max_h = main_grid.height;
+  path.max_w = main_grid.width;
+  */
+  for(int i = 0;i< (path.max_h * path.max_w)-1;i++){
+    path.priority_list[i] = 0;
+  }
   while (!WindowShouldClose()) {
     #pragma region Step Invent
     //inst_array.array[0].f_create(&inst_array.array[0], GLOBAL_PTR_ARRAY);
@@ -394,10 +488,8 @@ int main(){
         freeUsedAInt(&path.open);
         freeUsedAInt(&path.closed);
         freeUsedAInt(&path.final_path);
-        AStar2(&path.open, &path.closed, (GridVector2D){.x = main_grid.width ,.y =main_grid.height }
-              ,path.node_map
-              ,GLOBAL_LOCKON_CELL->grid_pos, cell_on_hover.grid_pos
-              ,&path.final_path);
+        FindPathDi(&path, GLOBAL_LOCKON_CELL->grid_pos, cell_on_hover.grid_pos);
+        //Astar(&path, GLOBAL_LOCKON_CELL->grid_pos, cell_on_hover.grid_pos);
       }
       //printf("open used: %llu\n", path.open.used );
       for(u32 i = 0;i < path.open.used;i++){
@@ -466,6 +558,14 @@ int main(){
         for(unsigned int i = 0;i <= main_grid.width;i++){
           DrawLine(PIXEL_SIZE * i,0,  PIXEL_SIZE * i,PIXEL_SIZE * main_grid.height , BLACK);
         }
+        #if DEBUG_MODE
+        for(unsigned int h = 0;h < path.max_h ;h++){
+          for(unsigned int w = 0;w <path.max_w;w++){
+            DrawText(TextFormat("G:%i",path.node_map[w + (h * path.max_w)].G), w * PIXEL_SIZE +2 , h * PIXEL_SIZE+ 12, 12, WHITE);
+            DrawText(TextFormat("H:%i",path.node_map[w + (h * path.max_w)].H), w * PIXEL_SIZE +2,  h * PIXEL_SIZE, 12, WHITE);
+          }
+        }
+        #endif
         //DrawTexture(selected_tile, (grid_on_hover_pos.x * PIXEL_SIZE)-1, (grid_on_hover_pos.y * PIXEL_SIZE)-1, WHITE);
         //DrawRectangleLines( (grid_on_hover_pos.x * PIXEL_SIZE)-1, (grid_on_hover_pos.y * PIXEL_SIZE)-1,PIXEL_SIZE+2, PIXEL_SIZE+2, YELLOW);
         UpdateDrawInstances(&inst_array, GLOBAL_PTR_ARRAY);
