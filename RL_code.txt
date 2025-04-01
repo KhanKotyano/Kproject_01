@@ -1,7 +1,7 @@
 /*
 u8 AssignFunctions(void(***_function_array)(Instance*), u16 _type){
   u8 f_size = 0;
-  switch(_type){
+  switch(_type){gfgfgf
     case PLAYER:{
       f_size = 1;
       *_function_array = (void(**)(Instance*))malloc(f_size * sizeof(void*));
