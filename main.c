@@ -33,7 +33,7 @@ Cell prev_on_hover = { 0 };
 Cell lock_on_cell  = { 0 };
 Cell empty_lockon_cell = { 0 };
 Vector2 mouse_world_pos;
-PointerArray g_pt_array;
+PointerArray g_pt_array = {0};
 
 
 #ifndef _CUSTOM_DEF
