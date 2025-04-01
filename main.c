@@ -27,7 +27,6 @@ Camera2D camera = { 0 };
 //Camera3D camera_3d = { 0 };
 InstanceArray inst_array;
 IntArray creation_inst_array = { 0 };
-//Instance **creation_inst_array; 
 Cell cell_on_hover = { 0 }; 
 Cell prev_on_hover = { 0 };
 Cell lock_on_cell  = { 0 };
