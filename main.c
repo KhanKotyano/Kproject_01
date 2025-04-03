@@ -23,7 +23,6 @@ const int screenHeight = 720;
 unsigned int WorldGridHeight = 10;
 unsigned int WorldGridWidth = 20;
 Camera2D camera = { 0 };
-//Camera3D camera_3d = { 0 };
 InstanceArray inst_array;
 IntArray creation_inst_array = { 0 };
 Cell cell_on_hover = { 0 }; 
